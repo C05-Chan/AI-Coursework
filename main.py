@@ -1,61 +1,123 @@
 import random
+import math
 
-def check_if_legs_cross(angles):
-     is_bad = False
+# def check_if_legs_cross(angles):
+#     is_bad = False
+#     base_angle = [45, ]
 
+#     return (is_bad)
 
-     return (is_bad)
+def generate_angles(): # generates 1 frame
+    angles = []
+    for i in range(24):
+        angles.append(round(random.uniform(0,6.28),3)) #only in range that is (360 degrees)
+    return(angles)
 
-def generate_angles(): # generates 1 animations
-    frames=300
-    animation=[]
-    for x in range(frames):
-            angles = []
-            is_bad=True
-            while is_bad:
-                for _ in range(24):
-                    angles.append(round(random.uniform(0,2),2)) #only in range that is legal
-                is_bad = check_if_legs_cross(angles)  #    
-                animation.append(angles)
-    return(animation)
+def fitness_body_cross(frame): # this checks if the angles are legal (illegal angles means the legs are intersecting the body, etc.)
+    fitness = 0
+    for i in range(8):
+        x = 0
+        leg = frame[x: x+3]
+        if 0.38 < leg[0] < -0.38:
+            fitness += abs(leg[0]*10)
+        else:
+            fitness += abs(leg[0])
+            
+        if -0.5 > leg[1] > -2:
+            fitness += abs(leg[1]*10)
+        else:
+            fitness += abs(leg[1])
+        
+        if 0 > leg[2] > -0.5:
+            fitness += abs(leg[2]*10)
+        else:
+            fitness += abs(leg[2])
+        x += 3
 
-def fitness_body_cross(population): # this checks if the angles are legal (illegal angles means the legs are intersecting the body, etc.)
-     body_cords = [0,0,0]
-
-     return (fit_angles)
+    fit_angles = round(fitness,2)
+    return (fit_angles)
      
      
-def fitness_selection(population):
-    angles = fitness_angles(population)
+def fitness_selection(ranked_population):
+    # lowestfit = [ranked_population]
+    # selectionwheel = []
+    current_round = [ranked_population]
+    next_round = []
+    top_fit = []
+    finish = False
+
+    while finish == False:
+        for i in range(len(current_round)):
+            contendor_one = random.randint
+            contendor_two = random.randint
+            if current_round[contendor_one] <= current_round[contendor_two]:
+                next_round.append(current_round[contendor_one])
+            else:
+                next_round.append(current_round[contendor_two])
+            
+            if len(next_round) == 3:
+                finish = True
+
+    # while i < len(ranked_population):
+    #     if ranked_population[i] < lowestfit[len(lowestfit)-1]:
+    #         lowestfit.append(ranked_population[i])
+    #     else:
+    #         for x in range(len(lowestfit)):
+    #             if ranked_population[i] < lowestfit[x]:
+    #                 lowestfit.insert(x+1, ranked_population[i])
+    #                 break
+    #             else:
+    #                 lowestfit.insert(0, ranked_population[i])
+    #                 break
+    #     i += 1
+
+    # for i in range(len(lowestfit)):
+    #     for x in range(len(lowestfit) - i):
+    #         selectionwheel.append(lowestfit[len(lowestfit) - i-1])
     
-    return (fit_population)
+    # for i in range(3):
+    #     selected_cromo = random.randint(0,len(selectionwheel)-1)
+    #     top_fit.append(selectionwheel[selected_cromo])
+    #     deleted = False
+    #     while deleted == False:
 
-def offspring(fit_population):
-     fit_offspring = []
+        
 
-     return (fit_offspring)
+    return (lowestfit, top_fit)
 
-def new_population(mutated_offspring):
-     new_pop = []
+# def offspring(fit_population):
+#      fit_offspring = []
 
-     return(new_pop)
+#      return (fit_offspring)
 
-def mutation(fit_offspring):
-     mutated_offspring = []
+# def mutation(fit_offspring):
+#      mutated_offspring = []
 
-     return (mutated_offspring)
+#      return (mutated_offspring)
+
+# def new_population(mutated_offspring):
+#      new_pop = []
+
+#      return(new_pop)
 
 def main():
     mutation_rate = 0.01
-    population_size = 100
+    population_size = 10
     population = []
-
+    fit_population = []
+    i = 0
     for i in range(population_size):
         population.append(generate_angles())
     
-    fit_population = fitness_selection(population)
-    fit_offspring = offspring(fit_population)
-    mutated_offspring = mutation(fit_offspring, mutation_rate)
-    population = new_population(mutated_offspring)
+    # fitness_rank = 
+    for x in range(population_size):
+        fit_population.append(fitness_body_cross(population[x]))
+    # print(fit_population)
+    print(fitness_selection(fit_population))
+
+    # fit_population = fitness_selection(population)
+    # fit_offspring = offspring(fit_population)
+    # mutated_offspring = mutation(fit_offspring, mutation_rate)
+    # population = new_population(mutated_offspring)
 
 main() # Starts the program 
