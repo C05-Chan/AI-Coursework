@@ -41,22 +41,40 @@ def fitness_body_cross(frame): # this checks if the angles are legal (illegal an
 def fitness_selection(ranked_population):
     # lowestfit = [ranked_population]
     # selectionwheel = []
-    current_round = [ranked_population]
+    current_round = []
     next_round = []
     top_fit = []
     finish = False
 
+    for i in range(len(ranked_population)):
+        current_round.append(ranked_population[i])
+
     while finish == False:
-        for i in range(len(current_round)):
-            contendor_one = random.randint
-            contendor_two = random.randint
-            if current_round[contendor_one] <= current_round[contendor_two]:
+        print("Participents: ",next_round)
+        next_round = []
+        for i in range((round(len(current_round)/2))):
+            contendor_one = random.randint(0,len(current_round)-1)
+            contendor_two = random.randint(0,len(current_round)-1)
+            if contendor_one == contendor_two:
+                contendor_one = random.randint(0,len(current_round)-1)
+                contendor_two = random.randint(0,len(current_round)-1)
+            elif current_round[contendor_one] <= current_round[contendor_two]:
+                print("Contestent 1 win:", current_round[contendor_one],"<", current_round[contendor_two])
                 next_round.append(current_round[contendor_one])
+                del current_round[contendor_one]
             else:
+                print("Contestent 2 win:", current_round[contendor_two],"<", current_round[contendor_one])
                 next_round.append(current_round[contendor_two])
-            
-            if len(next_round) == 3:
+                del current_round[contendor_two]
+            if len(current_round) == 3:
                 finish = True
+                break
+            
+        if finish == False:
+            current_round = next_round
+        print("---round---")
+        
+    return(current_round)
 
     # while i < len(ranked_population):
     #     if ranked_population[i] < lowestfit[len(lowestfit)-1]:
@@ -83,7 +101,7 @@ def fitness_selection(ranked_population):
 
         
 
-    return (lowestfit, top_fit)
+    # return (lowestfit, top_fit)
 
 # def offspring(fit_population):
 #      fit_offspring = []
@@ -102,7 +120,7 @@ def fitness_selection(ranked_population):
 
 def main():
     mutation_rate = 0.01
-    population_size = 10
+    population_size = 100
     population = []
     fit_population = []
     i = 0
@@ -112,8 +130,8 @@ def main():
     # fitness_rank = 
     for x in range(population_size):
         fit_population.append(fitness_body_cross(population[x]))
-    # print(fit_population)
-    print(fitness_selection(fit_population))
+    print("input: ", fit_population)
+    print("output: ", fitness_selection(fit_population))
 
     # fit_population = fitness_selection(population)
     # fit_offspring = offspring(fit_population)
