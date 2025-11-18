@@ -35,15 +35,12 @@ def fitness_body_cross(frame): # this checks if the angles are legal (illegal an
         x += 3
 
     fit_angles = round(fitness,2)
-    return (fit_angles)
+    return (fit_angles,frame)
      
      
-def fitness_selection(ranked_population):
-    # lowestfit = [ranked_population]
-    # selectionwheel = []
+def fitness_selection(ranked_population): # tournamen style selection output 3 cromosones
     current_round = []
     next_round = []
-    top_fit = []
     finish = False
 
     for i in range(len(ranked_population)):
@@ -59,11 +56,11 @@ def fitness_selection(ranked_population):
                 contendor_one = random.randint(0,len(current_round)-1)
                 contendor_two = random.randint(0,len(current_round)-1)
             elif current_round[contendor_one] <= current_round[contendor_two]:
-                print("Contestent 1 win:", current_round[contendor_one],"<", current_round[contendor_two])
+                print("Contestent 1 win:", current_round[contendor_one][0],"<", current_round[contendor_two][0])
                 next_round.append(current_round[contendor_one])
                 del current_round[contendor_one]
             else:
-                print("Contestent 2 win:", current_round[contendor_two],"<", current_round[contendor_one])
+                print("Contestent 2 win:", current_round[contendor_two][0],"<", current_round[contendor_one][0])
                 next_round.append(current_round[contendor_two])
                 del current_round[contendor_two]
             if len(current_round) == 3:
@@ -75,33 +72,6 @@ def fitness_selection(ranked_population):
         print("---round---")
         
     return(current_round)
-
-    # while i < len(ranked_population):
-    #     if ranked_population[i] < lowestfit[len(lowestfit)-1]:
-    #         lowestfit.append(ranked_population[i])
-    #     else:
-    #         for x in range(len(lowestfit)):
-    #             if ranked_population[i] < lowestfit[x]:
-    #                 lowestfit.insert(x+1, ranked_population[i])
-    #                 break
-    #             else:
-    #                 lowestfit.insert(0, ranked_population[i])
-    #                 break
-    #     i += 1
-
-    # for i in range(len(lowestfit)):
-    #     for x in range(len(lowestfit) - i):
-    #         selectionwheel.append(lowestfit[len(lowestfit) - i-1])
-    
-    # for i in range(3):
-    #     selected_cromo = random.randint(0,len(selectionwheel)-1)
-    #     top_fit.append(selectionwheel[selected_cromo])
-    #     deleted = False
-    #     while deleted == False:
-
-        
-
-    # return (lowestfit, top_fit)
 
 # def offspring(fit_population):
 #      fit_offspring = []
@@ -120,7 +90,7 @@ def fitness_selection(ranked_population):
 
 def main():
     mutation_rate = 0.01
-    population_size = 100
+    population_size = 5
     population = []
     fit_population = []
     i = 0
@@ -130,8 +100,17 @@ def main():
     # fitness_rank = 
     for x in range(population_size):
         fit_population.append(fitness_body_cross(population[x]))
-    print("input: ", fit_population)
-    print("output: ", fitness_selection(fit_population))
+    print("input raw: ", fit_population)
+    input_fit = []
+    for i in range(len(fit_population)):
+        input_fit.append(fit_population[i][0])
+    print("input fitness:", input_fit)
+    output = fitness_selection(fit_population)
+    output_fit = []
+    for i in range(len(output)):
+        output_fit.append(output[i][0])
+    print("output fitness:", output_fit)
+    print("output raw: ", output)
 
     # fit_population = fitness_selection(population)
     # fit_offspring = offspring(fit_population)
