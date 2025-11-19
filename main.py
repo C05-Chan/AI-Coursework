@@ -72,9 +72,10 @@ def crossover(parent1, parent2):
 
 def mutation(fit_offspring):
      mutated_offspring = []
+     mutated_offspring = fit_offspring
      for i in range(24):
         if random.randint(0,1) == 1:
-            mutated_offspring(round(random.random(),2))
+            mutated_offspring[i] = (round(random.random(),3))
      return (mutated_offspring)
 
 def new_population(mutated_offspring):
@@ -87,7 +88,8 @@ def main():
     population_size = 100
     population = []
     fit_population = []
-    i = 0
+    test_angles = generate_angles()
+
     for i in range(population_size):
         population.append(generate_angles())
     
