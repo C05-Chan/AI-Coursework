@@ -52,7 +52,7 @@ def fitness_selection(ranked_population): # tournamen style selection output 3 c
         Normilized_nums.append([ranked_population[i][0] / total_sum,ranked_population[i][1]])
 
     for i in range(len(Normilized_nums)):
-        cumulative_sum.append(Normilized_nums[i][0] + pre_nums)
+        cumulative_sum.append([Normilized_nums[i][0] + pre_nums, ranked_population[i][1]])
         pre_nums += Normilized_nums[i][0]
     
     for i in range(len(cumulative_sum)):
