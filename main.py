@@ -1,5 +1,10 @@
 import random
 import math
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from spider_plot import plot_spider_pose, forward_leg_kinematics2
+
+
 
 # def check_if_legs_cross(angles):
 #     is_bad = False
@@ -36,8 +41,8 @@ def fitness_body_cross(frame): # this checks if the angles are legal (illegal an
 
     fit_angles = round(fitness,2)
     return (fit_angles,frame)
-     
-     
+
+
 def fitness_selection(ranked_population): # tournamen style selection output 3 cromosones ' add 2 training dummys 1000 and 1 value
     total_sum = 0
     seelected = 0
@@ -74,9 +79,21 @@ def mutation(fit_offspring):
      return (mutated_offspring)
 
 def new_population(mutated_offspring):
-     new_pop = []
+    new_pop = []
 
-     return(new_pop)
+    return(new_pop)
+
+def animate_frames(frames):
+    fig = plt.figure(figsize=(8,8))
+    ax = fig.add_subplot(111, projection='3d')
+
+    def update(i):
+        plot_spider_pose(ax, frames[i])
+        return []
+
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=500)
+    plt.show()
+
 
 def main():
     mutation_rate = 0.01
@@ -104,5 +121,12 @@ def main():
     # fit_offspring = offspring(fit_population)
     # mutated_offspring = mutation(fit_offspring, mutation_rate)
     # population = new_population(mutated_offspring)
+    angles_frame = []
+
+    for _ in range(300):
+        angles_frame.append(generate_angles())
+
+    animate_frames(angles_frame)
+
 
 main() # Starts the program 
