@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 
 # ------------------------------
@@ -73,7 +74,8 @@ def forward_leg_kinematics2(base_pos, base_angle, joint_angles, segment_lengths)
 # ------------------------------
 # Main Plot Function
 # ------------------------------
-def plot_spider_pose(angles):
+def plot_spider_pose(ax, angles):
+
 
     n_legs = 8
     segment_lengths = np.array([1.2, 0.7, 1.0])
@@ -90,8 +92,11 @@ def plot_spider_pose(angles):
         raise ValueError("angles must be length 24")
 
     # ---- PLOT SETUP ----
-    fig = plt.figure(figsize=(8,8))
-    ax = fig.add_subplot(111, projection='3d')
+    # fig = plt.figure(figsize=(8,8))
+    # ax = fig.add_subplot(111, projection='3d')
+    ax.cla() 
+    
+
     ax.set_xlim([-4,4])
     ax.set_ylim([-4,4])
     ax.set_zlim([-2,2])
@@ -99,59 +104,29 @@ def plot_spider_pose(angles):
     ax.view_init(elev=30, azim=45)
     ax.grid(True)
 
-    # ---- Body (ellipse) ----
+    # draw body
     t = np.linspace(0, 2*np.pi, 200)
     bx = a * np.cos(t)
     by = b * np.sin(t)
     ax.plot(bx, by, 0, 'k', linewidth=3)
-
-    # Head marker
     ax.scatter([a + 0.2], [0], [0], c='r', s=60, marker='^')
 
-    print("--- Spider Pose ---")
-
-    # ---- Loop Through Legs ----
+    # draw legs
     for i in range(n_legs):
         idx = i*3
         th1, th2, th3 = angles[idx:idx+3]
-        print(f"Leg {leg_labels[i]}: {th1:.3f}, {th2:.3f}, {th3:.3f}")
 
-        # base position on ellipse
         ang = base_angles[i]
         x_base = a * np.cos(ang)
         y_base = b * np.sin(ang)
         base_pos = np.array([x_base, y_base, 0.0])
 
-        # forward kinematics
         j1, j2, j3, j4 = forward_leg_kinematics2(base_pos, ang,
                                                  [th1, th2, th3],
                                                  segment_lengths)
 
-        # plot segments
         ax.plot([j1[0], j2[0]], [j1[1], j2[1]], [j1[2], j2[2]], 'k')
         ax.plot([j2[0], j3[0]], [j2[1], j3[1]], [j2[2], j3[2]], 'b')
         ax.plot([j3[0], j4[0]], [j3[1], j4[1]], [j3[2], j4[2]], 'r')
         ax.scatter([j4[0]], [j4[1]], [j4[2]], c='r', s=30)
 
-        # label
-        off = 0.2
-        lx = x_base + off*np.cos(ang)
-        ly = y_base + off*np.sin(ang)
-        ax.text(lx, ly, 0.05, leg_labels[i], fontsize=10)
-
-    plt.show()
-
-
-
-angles = [
-    0.38, -2, -0.5, 
-    -0.38, -0.5, 0,
-    0.38, -2, -0.5,
-    -0.38, -0.5, 0,
-    -0.38, -0.5, -0, 
-    0.38, -2, -0.5, 
-    -0.38, -0.5, 0, 
-    0.38, -2, -0.5 
-]
-
-plot_spider_pose(angles)
