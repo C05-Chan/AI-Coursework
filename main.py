@@ -39,58 +39,48 @@ def fitness_body_cross(frame): # this checks if the angles are legal (illegal an
      
      
 def fitness_selection(ranked_population): # tournamen style selection output 3 cromosones ' add 2 training dummys 1000 and 1 value
-    current_round = []
-    next_round = []
-    finish = False
+    total_sum = 0
+    seelected = 0
+    pre_nums = 0
+    Normilized_nums = []
+    cumulative_sum = []
+    selected_cromosones = []
+    for i in range(len(ranked_population)):
+        total_sum += ranked_population[i][0]
 
     for i in range(len(ranked_population)):
-        current_round.append(ranked_population[i])
+        Normilized_nums.append([ranked_population[i][0] / total_sum,ranked_population[i][1]])
 
-    while finish == False:
-        print("Participents: ",next_round)
-        next_round = []
-        for i in range((round(len(current_round)/2))):
-            contendor_one = random.randint(0,len(current_round)-1)
-            contendor_two = random.randint(0,len(current_round)-1)
-            if contendor_one == contendor_two:
-                contendor_one = random.randint(0,len(current_round)-1)
-                contendor_two = random.randint(0,len(current_round)-1)
-            elif current_round[contendor_one] <= current_round[contendor_two]:
-                print("Contestent 1 win:", current_round[contendor_one][0],"<", current_round[contendor_two][0])
-                next_round.append(current_round[contendor_one])
-                del current_round[contendor_one]
-            else:
-                print("Contestent 2 win:", current_round[contendor_two][0],"<", current_round[contendor_one][0])
-                next_round.append(current_round[contendor_two])
-                del current_round[contendor_two]
-            if len(current_round) == 2:
-                finish = True
+    for i in range(len(Normilized_nums)):
+        cumulative_sum.append(Normilized_nums[i][0] + pre_nums)
+        pre_nums += Normilized_nums[i][0]
+    
+    for i in range(len(cumulative_sum)):
+        selected = random.random()
+        for i in range(len(cumulative_sum)):
+            if selected < cumulative_sum[i][0]:
+                selected_cromosones.append(cumulative_sum[i][0])
                 break
-            
-        if finish == False:
-            current_round = next_round
-        print("---round---")
-        
-    return(current_round)
+    return(selected_cromosones)
 
-# def offspring(fit_population):
-#      fit_offspring = []
+def offspring(fit_population):
+     fit_offspring = []
 
-#      return (fit_offspring)
+     return (fit_offspring)
 
-# def mutation(fit_offspring):
-#      mutated_offspring = []
+def mutation(fit_offspring):
+     mutated_offspring = []
 
-#      return (mutated_offspring)
+     return (mutated_offspring)
 
-# def new_population(mutated_offspring):
-#      new_pop = []
+def new_population(mutated_offspring):
+     new_pop = []
 
-#      return(new_pop)
+     return(new_pop)
 
 def main():
     mutation_rate = 0.01
-    population_size = 5
+    population_size = 100
     population = []
     fit_population = []
     i = 0
@@ -106,11 +96,9 @@ def main():
         input_fit.append(fit_population[i][0])
     print("input fitness:", input_fit)
     output = fitness_selection(fit_population)
-    output_fit = []
-    for i in range(len(output)):
-        output_fit.append(output[i][0])
-    print("output fitness:", output_fit)
-    print("output raw: ", output)
+        
+    print("output:", output)
+    print("output length: ", len(output))
 
     # fit_population = fitness_selection(population)
     # fit_offspring = offspring(fit_population)
