@@ -64,8 +64,8 @@ def fitness_selection(ranked_population): # tournamen style selection output 3 c
     return(selected_cromosones)
 
 def offspring(fit_population):
-     fit_offspring = []
-
+     
+    
      return (fit_offspring)
 
 def mutation(fit_offspring):
