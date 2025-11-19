@@ -38,22 +38,22 @@ def fitness_body_cross(frame): # this checks if the angles are legal (illegal an
     return (fit_angles,frame)
      
      
-def fitness_selection(ranked_population): # tournamen style selection output 3 cromosones ' add 2 training dummys 1000 and 1 value
+def fitness_selection(ranked_population): # tournament style selection output 3 cromosones ' add 2 training dummys 1000 and 1 value
     total_sum = 0
-    seelected = 0
+    selected = 0
     pre_nums = 0
-    Normilized_nums = []
+    normalised_nums = []
     cumulative_sum = []
     selected_cromosones = []
     for i in range(len(ranked_population)):
         total_sum += ranked_population[i][0]
 
     for i in range(len(ranked_population)):
-        Normilized_nums.append([ranked_population[i][0] / total_sum,ranked_population[i][1]])
+        normalised_nums.append([ranked_population[i][0] / total_sum,ranked_population[i][1]])
 
-    for i in range(len(Normilized_nums)):
-        cumulative_sum.append([Normilized_nums[i][0] + pre_nums, ranked_population[i][1]])
-        pre_nums += Normilized_nums[i][0]
+    for i in range(len(normalised_nums)):
+        cumulative_sum.append([normalised_nums[i][0] + pre_nums, ranked_population[i][1]])
+        pre_nums += normalised_nums[i][0]
     
     for i in range(len(cumulative_sum)):
         selected = random.random()
@@ -63,14 +63,18 @@ def fitness_selection(ranked_population): # tournamen style selection output 3 c
                 break
     return(selected_cromosones)
 
-def offspring(fit_population):
-     
-    
-     return (fit_offspring)
+def crossover(parent1, parent2):
+    i = (random.randint(1,8)) * 3
+    child = parent1[0:i] + parent2[i:-1]
+    child += parent2[0:i] + parent1[i:-1]
+
+    return (children)
 
 def mutation(fit_offspring):
      mutated_offspring = []
-
+     for i in range(24):
+        if random.randint(0,1) == 1:
+            mutated_offspring(round(random.random(),2))
      return (mutated_offspring)
 
 def new_population(mutated_offspring):
