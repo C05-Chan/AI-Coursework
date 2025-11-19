@@ -38,7 +38,7 @@ def fitness_body_cross(frame): # this checks if the angles are legal (illegal an
     return (fit_angles,frame)
      
      
-def fitness_selection(ranked_population): # tournamen style selection output 3 cromosones
+def fitness_selection(ranked_population): # tournamen style selection output 3 cromosones ' add 2 training dummys 1000 and 1 value
     current_round = []
     next_round = []
     finish = False
@@ -63,7 +63,7 @@ def fitness_selection(ranked_population): # tournamen style selection output 3 c
                 print("Contestent 2 win:", current_round[contendor_two][0],"<", current_round[contendor_one][0])
                 next_round.append(current_round[contendor_two])
                 del current_round[contendor_two]
-            if len(current_round) == 3:
+            if len(current_round) == 2:
                 finish = True
                 break
             
