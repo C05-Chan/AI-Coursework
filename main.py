@@ -26,32 +26,34 @@ def generate_angles(): # generates 1 frame
 
     return(gaits)
 
-def fitness_body_cross(frame): # this checks if the angles are legal (illegal angles means the legs are intersecting the body, etc.)
+def fitness_function(prev,frame):   #this calculates a how good the frame fits to the previous frame with a slight difference
     fitness = 0
-    for i in range(8):
-        x = 0
-        leg = frame[x: x+3]
-        if 0.38 < leg[0] < -0.38:
-            fitness += abs(leg[0]*10)
+    for i in range(len(prev)):
+        if prev[i] < frame[i]:
+            fitness += (prev[i] - frame[i] - 0.2)^(4-i) # punishes less if the further the
         else:
-            fitness += abs(leg[0])
-            
-        if -0.5 > leg[1] > -2:
-            fitness += abs(leg[1]*10)
-        else:
-            fitness += abs(leg[1])
-        
-        if 0 > leg[2] > -0.5:
-            fitness += abs(leg[2]*10)
-        else:
-            fitness += abs(leg[2])
-        x += 3
+            fitness += (prev[i] - frame[i] + 0.2)^(4-i)
+    return fitness
 
-    fit_angles = round(fitness,2)
-    return (fit_angles,frame)
+def breeding(prev,frame): #cuts two frames at random spots and combines them
+    i = random.randint(0,len(prev)-1)
+
+    prevA=prev[:i]
+    prevB=prev[i+1:]
+    frameA=frame[:i]
+    frameB=frame[i+1:]
+
+    new1 = []
+    new2 = []
+    new1.append(prevA)
+    new1.append(frameB)
+
+    new2.append(frameA)
+    new2.append(prevB)
+
+    return new1, new2  
      
-     
-def fitness_selection(ranked_population): # tournament style selection output 3 cromosones ' add 2 training dummys 1000 and 1 value
+def roulette_selection(ranked_population): # tournament style selection output 3 chromosones ' add 2 training dummys 1000 and 1 value
     total_sum = 0
     selected = 0
     pre_nums = 0
@@ -75,13 +77,6 @@ def fitness_selection(ranked_population): # tournament style selection output 3 
                 selected_cromosones.append(cumulative_sum[i][0])
                 break
     return(selected_cromosones)
-
-def crossover(parent1, parent2):
-    i = (random.randint(1,8)) * 3
-    child = parent1[0:i] + parent2[i:-1]
-    child += parent2[0:i] + parent1[i:-1]
-
-    return (children)
 
 def mutation(fit_offspring):
      mutated_offspring = []
@@ -115,28 +110,9 @@ def main():
     i = 0
     for i in range(population_size):
         population.insert(i,generate_angles())
-    
-    # # fitness_rank = 
-    # for x in range(population_size):
-    #     fit_population.append(fitness_body_cross(population[x]))
-    # print("input raw: ", fit_population)
-    # input_fit = []
-    # for i in range(len(fit_population)):
-    #     input_fit.append(fit_population[i])
-    # print("input fitness:", input_fit)
-    # output = fitness_selection(fit_population)
-        
-    # print("output:", output)
-    # print("output length: ", len(output))
 
-    # fit_population = fitness_selection(population)
-    # fit_offspring = offspring(fit_population)
-    # mutated_offspring = mutation(fit_offspring, mutation_rate)
-    # population = new_population(mutated_offspring)
     angles_frame = []
-    print(population[0])
-    # for _ in range(300):
-    #     angles_frame.append(generate_angles())
+    
     print(population[0][0])
     for i in range(300):
         angles_frame.append(population[0][i])
@@ -145,4 +121,4 @@ def main():
     # animate_frames(population[0])
 
 
-main() # Starts the program 
+main() # Starts the program frame[[1,2,3]]
