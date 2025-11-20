@@ -13,10 +13,18 @@ from spider_plot import plot_spider_pose, forward_leg_kinematics2
 #     return (is_bad)
 
 def generate_angles(): # generates 1 frame
-    angles = []
-    for i in range(24):
-        angles.append(round(random.uniform(0,6.28),3)) #only in range that is (360 degrees)
-    return(angles)
+    gaits = [[]]
+    
+    for x in range(300):
+        angles = []
+        for i in range(8):
+            angles.append(round(random.uniform(-0.38,0.38),3))
+            angles.append(round(random.uniform(-0.5,-2),3))
+            angles.append(round(random.uniform(-0.5,0),3))
+            # angles.append(round(random.uniform(0,6.28),3)) #only in range that is (360 degrees)
+        gaits.insert(x,angles)
+
+    return(gaits)
 
 def fitness_body_cross(frame): # this checks if the angles are legal (illegal angles means the legs are intersecting the body, etc.)
     fitness = 0
@@ -101,36 +109,40 @@ def animate_frames(frames):
 
 def main():
     mutation_rate = 0.01
-    population_size = 100
-    population = []
+    population_size = 1
+    population = [[]]
     fit_population = []
     i = 0
     for i in range(population_size):
-        population.append(generate_angles())
+        population.insert(i,generate_angles())
     
-    # fitness_rank = 
-    for x in range(population_size):
-        fit_population.append(fitness_body_cross(population[x]))
-    print("input raw: ", fit_population)
-    input_fit = []
-    for i in range(len(fit_population)):
-        input_fit.append(fit_population[i][0])
-    print("input fitness:", input_fit)
-    output = fitness_selection(fit_population)
+    # # fitness_rank = 
+    # for x in range(population_size):
+    #     fit_population.append(fitness_body_cross(population[x]))
+    # print("input raw: ", fit_population)
+    # input_fit = []
+    # for i in range(len(fit_population)):
+    #     input_fit.append(fit_population[i])
+    # print("input fitness:", input_fit)
+    # output = fitness_selection(fit_population)
         
-    print("output:", output)
-    print("output length: ", len(output))
+    # print("output:", output)
+    # print("output length: ", len(output))
 
     # fit_population = fitness_selection(population)
     # fit_offspring = offspring(fit_population)
     # mutated_offspring = mutation(fit_offspring, mutation_rate)
     # population = new_population(mutated_offspring)
     angles_frame = []
-
-    for _ in range(300):
-        angles_frame.append(generate_angles())
+    print(population[0])
+    # for _ in range(300):
+    #     angles_frame.append(generate_angles())
+    print(population[0][0])
+    for i in range(300):
+        angles_frame.append(population[0][i])
 
     animate_frames(angles_frame)
+    # animate_frames(population[0])
 
 
 main() # Starts the program 
