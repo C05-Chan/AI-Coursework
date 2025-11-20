@@ -78,17 +78,19 @@ def roulette_selection(ranked_population): # tournament style selection output 3
                 break
     return(selected_cromosones)
 
-def mutation(fit_offspring):
-     mutated_offspring = []
-     for i in range(24):
-        if random.randint(0,1) == 1:
-            mutated_offspring(round(random.random(),2))
-     return (mutated_offspring)
-
-def new_population(mutated_offspring):
-    new_pop = []
-
-    return(new_pop)
+def mutation(population, mutation_rate):
+    mutated_offspring = []
+    for i in range(len(population)): #goes through animations
+        for x in range(len(population[0])): # goes through frames in an individual
+            if random.random() < mutation_rate: # if under mutation rate
+                mutated_offspring.append(population[i][x]) #
+                for y in range(len(mutated_offspring)):
+                    if random.randint(0,1) == 1:
+                        mutated_offspring[y] = (round(random.random(),2))
+                print(i,x)
+                population[i][x] = mutated_offspring
+                
+    return (population)
 
 def animate_frames(frames):
     fig = plt.figure(figsize=(8,8))
@@ -103,21 +105,30 @@ def animate_frames(frames):
 
 
 def main():
-    mutation_rate = 0.01
+    mutation_rate = 1
     population_size = 1
     population = [[]]
-    fit_population = []
-    i = 0
+    generations = 10
+    
+
     for i in range(population_size):
         population.insert(i,generate_angles())
+    print(population)
+    print(mutation(population, mutation_rate))
 
-    angles_frame = []
+    # for i in generations:
+    #     fitness = fitness_function(population)
+    #     selected = roulette_selection(fitness)
+    #     offspring = breeding(selected)
+    #     population = mutation(offspring, mutation_rate)
+
+    # angles_frame = []
     
-    print(population[0][0])
-    for i in range(300):
-        angles_frame.append(population[0][i])
+    # print(population[0][0])
+    # for i in range(300):
+    #     angles_frame.append(population[0][i])
 
-    animate_frames(angles_frame)
+    # animate_frames(angles_frame)
     # animate_frames(population[0])
 
 
