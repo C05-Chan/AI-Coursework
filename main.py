@@ -115,7 +115,7 @@ def animate_frames(frames):
         plot_spider_pose(ax, frames[i])
         return []
 
-    ani = FuncAnimation(fig, update, frames=len(frames), interval=500)
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=250)
     plt.show()
 
 
@@ -141,8 +141,8 @@ def main():
     #generation loop
     gen_start = time.time()
     for i in range(generations):
-        
-        print("generation: ",i," ", round(gen_end - gen_start,3), "sec")
+        gen_time = gen_end - gen_start
+        print("Generation: ",i," ", round(gen_time,2) , "sec ", "Program End Eta: ", f"{math.floor(gen_time*(generations-i)/60)}.{round(gen_time*(generations-i)%60)}" , "mins")
         gen_start = time.time()
 
         #fitness function
