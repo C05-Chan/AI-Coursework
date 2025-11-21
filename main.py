@@ -20,12 +20,29 @@ def generate_angles(): # generates 1 animation (300 frames)
 
 def fitness_function(prev,frame):#this calculates a how good the frame fits to the previous frame with a slight difference (NEEDS RE-WRITEING DESPERATLY)
     fitness = 0
-    for i in range(len(prev)):
-        if prev[i] < frame[i]:
-            fitness += pow((prev[i] - frame[i] - 0.2),(4-i)) 
-        else:
-            fitness += pow((prev[i] - frame[i] + 0.2),(4-i))
+    max_angles = [0.38,-0.5,-0.5]
+    min_angles = [-0.38,-2,0]
+    for i in range(len(prev)): #loops 24 times
+        for x in range(8):
+            #checks first part of leg
+            if frame[x*3] < max_angles[0]:
+                fitness += frame[x*3]
+            elif frame[x*3] > min_angles[0]:
+                fitness += frame[x*3]
+            else:
+                fitness -= frame[x*3]
 
+            #checks second part of leg
+            if frame[x*3+1] < max_angles[1]:
+                fitness += frame[x*3+1]
+            elif frame[x*3+1] > min_angles[1]:
+                fitness += frame[x*3+1]
+            else:
+                fitness -= frame[x*3+1]
+            
+            #checks third part of leg
+            fitness -= 3.14-round(frame[x*3+2] + frame[x*3+1],2)
+            
     return fitness
 
 def breeding(prev,frame): #cuts two animations at random spots and combines them
@@ -42,7 +59,7 @@ def breeding(prev,frame): #cuts two animations at random spots and combines them
     for i in range(len(prevA)): 
         frameB.append(prevA[i])
 
-    return frameA, frameB  
+    return prev, frame 
      
 def roulette_selection(ranked_population): # tournament style selection output 3 chromosones ' add 2 training dummys 1000 and 1 value
     total_sum = 0
@@ -83,7 +100,7 @@ def mutation(population, mutation_rate): # mutates random angles in all frames i
 
                 for y in range(len(mutated_offspring)): #goes through angles (24)
                     if random.randint(0,1) == 1:
-                        mutated_offspring[y] = (round(random.random(),2))
+                        mutated_offspring[y] += (round(random.uniform(-0.0872665,0.0872665),2))
 
                 population[i][x] = mutated_offspring
                 mutated_offspring = []
@@ -104,9 +121,9 @@ def animate_frames(frames):
 
 def main():
     #GA parameters
-    mutation_rate = 0.01
+    mutation_rate = 0.001
     population_size = 100
-    generations = 100
+    generations = 10
 
     animation_fitness = 0
     population = []
@@ -140,8 +157,8 @@ def main():
         #selection function
         selected = roulette_selection(fitness)
         for x in range(len(fitness)): # getting best fit animation over entire program run
-            if fitness[i][0] >= best_fit[0]:
-                best_fit = fitness[i]
+            if fitness[x][0] <= best_fit[0]:
+                best_fit = fitness[x]
         fitness = []
         print("select: COMPLETE")
 
