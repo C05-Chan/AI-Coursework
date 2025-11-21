@@ -124,8 +124,8 @@ def main():
     #generation loop        
     gen_start = time.time()
     for i in range(generations):
-        gen_time =(gen_end - gen_start)
-        print("Generation: ",i," ", gen_time , "sec ", "Program End Eta: ", f"{math.floor(gen_time*(generations-i)/60)}.{round(gen_time*(generations-i)%60)}" , "mins")
+        gen_time = gen_end - gen_start
+        print("Generation: ",i," ", round(gen_time,2) , "sec ", "Program End Eta: ", f"{math.floor(gen_time*(generations-i)/60)}.{round(gen_time*(generations-i)%60)}" , "mins")
         gen_start = time.time()
 
         #fitness function
