@@ -18,30 +18,82 @@ def generate_angles(): # generates 1 animation (300 frames)
 
     return(gaits)
 
-def fitness_function(prev,frame):#this calculates a how good the frame fits to the previous frame with a slight difference (NEEDS RE-WRITEING DESPERATLY)
+def fitness_function(prev,current):#this calculates a how good the frame fits to the previous frame with a slight difference (NEEDS RE-WRITEING DESPERATLY)
     fitness = 0
     max_angles = [0.38,-0.5,-0.5]
     min_angles = [-0.38,-2,0]
     for i in range(len(prev)): #loops 24 times
         for x in range(8):
-            #checks first part of leg
-            if frame[x*3] < max_angles[0]:
-                fitness += frame[x*3]
-            elif frame[x*3] > min_angles[0]:
-                fitness += frame[x*3]
-            else:
-                fitness -= frame[x*3]
+            curent_coxa = current[x*3]
+            current_femer = current[x*3+1]
+            current_tibia = current[x*3+2]
+            prev_coxa = prev[x*3]
+            prev_femer = prev[x*3+1]
+            prec_tibia = prev[x*3+2]
+            #checks coxa
+            if curent_coxa < max_angles[0]:
+                if prev_coxa - curent_coxa < 0.02:
+                    fitness += curent_coxa
+                else:
+                    fitness -= curent_coxa 
 
-            #checks second part of leg
-            if frame[x*3+1] < max_angles[1]:
-                fitness += frame[x*3+1]
-            elif frame[x*3+1] > min_angles[1]:
-                fitness += frame[x*3+1]
+                #checks second part of leg
+                if current_femer < max_angles[1]:
+                    if prev_femer - current_femer < 0.02:
+                        fitness += current_femer
+                        
+                    else:
+                        fitness -= current_femer
+
+                    #checks third part of leg
+                    # if prev_femer - current_tibia < 0.02:
+                    #         fitness += current_tibia
+                        
+                    # else:
+                    #     fitness -= current_tibia
+                    #if current_tibia < (current_femer*0.1):
+                    if prev_femer - current_tibia < 0.02:
+                        fitness += current_tibia
+                        
+                    else:
+                        fitness -= current_tibia
+
+
+
+                else:
+                    fitness -= current_femer
+
+
+            elif curent_coxa > min_angles[0]:
+                if prev_coxa - curent_coxa > -0.02:
+                    fitness += curent_coxa
+                else:
+                    fitness -= curent_coxa
+
+                #checks second part of leg
+                if current_femer > min_angles[1]:
+                    if prev_femer - current_femer < 0.02:
+                        fitness += current_femer
+                    else:
+                        fitness -= current_femer
+                    
+                    #checks third part of leg
+                    #if current_tibia < (current_femer*0.1):
+                    if prev_femer - current_tibia < 0.02:
+                        fitness += current_tibia
+                    
+                    else:
+                        fitness -= current_tibia
+
+                else:
+                    fitness -= current_femer
+                
             else:
-                fitness -= frame[x*3+1]
+                fitness -= curent_coxa
             
             #checks third part of leg
-            fitness -= 3.14-round(frame[x*3+2] + frame[x*3+1],2)
+            if current_tibia < (current_femer*0.1):
+                fitness += current_tibia
             
     return fitness
 
@@ -100,7 +152,7 @@ def mutation(population, mutation_rate): # mutates random angles in all frames i
 
                 for y in range(len(mutated_offspring)): #goes through angles (24)
                     if random.randint(0,1) == 1:
-                        mutated_offspring[y] += (round(random.uniform(-0.0872665,0.0872665),2))
+                        mutated_offspring[y] += (round(random.uniform(-0.02,0.02),2))
 
                 population[i][x] = mutated_offspring
                 mutated_offspring = []
@@ -115,15 +167,15 @@ def animate_frames(frames):
         plot_spider_pose(ax, frames[i])
         return []
 
-    ani = FuncAnimation(fig, update, frames=len(frames), interval=250)
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=200)
     plt.show()
 
 
 def main():
     #GA parameters
     mutation_rate = 0.01
-    population_size = 100
-    generations = 10
+    population_size = 1000
+    generations = 1000
 
     animation_fitness = 0
     population = []
@@ -151,7 +203,6 @@ def main():
                 if y != len(population[0])-1:
                     animation_fitness += fitness_function(population[x][y], population[x][y+1])
             fitness.append([animation_fitness, population[x]])
-            frame_fitness = []
         print("fitness: COMPLETE")
 
         #selection function
