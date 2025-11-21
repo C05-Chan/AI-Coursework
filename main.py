@@ -1,6 +1,6 @@
 import random
-import math
 import time
+import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from spider_plot import plot_spider_pose, forward_leg_kinematics2
@@ -105,7 +105,7 @@ def animate_frames(frames):
 def main():
     #GA parameters
     mutation_rate = 0.01
-    population_size = 100
+    population_size = 800
     generations = 100
 
     animation_fitness = 0
@@ -121,11 +121,11 @@ def main():
     for i in range(population_size):
         population.append(generate_angles())
 
-    #generation loop
+    #generation loop        
     gen_start = time.time()
     for i in range(generations):
-        
-        print("generation: ",i," ", round(gen_end - gen_start,3), "sec")
+        gen_time =(gen_end - gen_start)
+        print("Generation: ",i," ", gen_time , "sec ", "Program End Eta: ", f"{math.floor(gen_time*(generations-i)/60)}.{round(gen_time*(generations-i)%60)}" , "mins")
         gen_start = time.time()
 
         #fitness function
@@ -134,8 +134,7 @@ def main():
                 if y != len(population[0])-1:
                     animation_fitness += fitness_function(population[x][y], population[x][y+1])
             fitness.append([animation_fitness, population[x]])
-            frame_fitness = []
-        print("fitness: COMPLETE")
+        print("Fitness: COMPLETE")
 
         #selection function
         selected = roulette_selection(fitness)
@@ -143,23 +142,23 @@ def main():
             if fitness[i][0] >= best_fit[0]:
                 best_fit = fitness[i]
         fitness = []
-        print("select: COMPLETE")
+        print("Select: COMPLETE")
 
         #offspring function
         for x in range(round(len(selected)/2)): # loops animations
                 if x != len(selected)-1:
                     offspring.append(breeding(selected[x][1], selected[x+1][1])[0])
                     offspring.append(breeding(selected[x][1], selected[x+1][1])[1])
-        print("offspring: COMPLETE")
+        print("Offspring: COMPLETE")
 
         #mutation function
         population = []
         population = mutation(offspring, mutation_rate)
         offspring = []
-        print("mutation: COMPLETE")
+        print("Mutation: COMPLETE")
         gen_end = time.time()
     program_run_end = time.time()
-    print("fin! Runtime: ", round(program_run_end - program_run_start,3),"sec")
+    print("FIN! Runtime: ", round(program_run_end - program_run_start,3),"sec")
     
     #animate function
     for i in range(len(best_fit[1])): 
