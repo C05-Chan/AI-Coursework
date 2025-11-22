@@ -52,14 +52,17 @@ def breeding(prev,frame): #cuts two frames at random spots and combines them
     new2.append(prevB)
 
     return new1, new2  
-     
+
+
 def roulette_selection(ranked_population): # tournament style selection output 3 chromosones ' add 2 training dummys 1000 and 1 value
     total_sum = 0
     selected = 0
     pre_nums = 0
+    
     normalised_nums = []
     cumulative_sum = []
     selected_cromosones = []
+    
     for i in range(len(ranked_population)):
         total_sum += ranked_population[i][0]
 
@@ -79,15 +82,14 @@ def roulette_selection(ranked_population): # tournament style selection output 3
     return(selected_cromosones)
 
 def mutation(fit_offspring):
-     mutated_offspring = []
-     for i in range(24):
+    mutated_offspring = []
+    for i in range(24):
         if random.randint(0,1) == 1:
             mutated_offspring(round(random.random(),2))
-     return (mutated_offspring)
+    return (mutated_offspring)
 
 def new_population(mutated_offspring):
     new_pop = []
-
     return(new_pop)
 
 def animate_frames(frames):
@@ -119,6 +121,8 @@ def main():
 
     animate_frames(angles_frame)
     # animate_frames(population[0])
+    
+    
 
 
 main() # Starts the program frame[[1,2,3]]
