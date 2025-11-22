@@ -46,12 +46,7 @@ def fitness_function(prev,current):#this calculates a how good the frame fits to
                         fitness -= current_femer
 
                     #checks third part of leg
-                    # if prev_femer - current_tibia < 0.02:
-                    #         fitness += current_tibia
-                        
-                    # else:
-                    #     fitness -= current_tibia
-                    #if current_tibia < (current_femer*0.1):
+
                     if prev_femer - current_tibia < 0.02:
                         fitness += current_tibia
                         
