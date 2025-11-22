@@ -22,7 +22,7 @@ def generate_angles(population_size):
 def fitness_function(total_angles):
     all_fitness = []
     
-    # print("total_angles", total_angles)
+    print("total_angles", total_angles)
     
     max_angles = [0.38,-0.5,-0.5] 
     min_angles = [-0.38,-2,0]
@@ -30,13 +30,14 @@ def fitness_function(total_angles):
     prev_angles = None
     
     for frames in total_angles:  
+        ### This sections splits the flat list of 24 angles into 8 legs with 3 angles each ###
         legs = []
         for i in range(0, len(frames), 3):
             legs.append(frames[i:i+3])
             
-        # print("legs", legs)
+        print("legs", legs)
 
-        fitness_score = 5.04  # max fitness is 8 legs * 3 joints * 0.2 = 4.8
+        fitness_score = 7.2  # max fitness
         fitness_pos = 0
         fitness_transition = 0
         
@@ -78,35 +79,63 @@ def fitness_function(total_angles):
     
     return all_fitness
 
-def tournament_selection(fitness_scores, tournament_size):
-    index_results = []
-    ranked_population = []
-    selected_population = []
-    exclude_indices = []
+
+def tournament_selection(fitness_scores, total_angles):
+    selected_parents = []
+
+    total_parents = len(total_angles) // 2
+
+    if total_parents % 2 != 0: #ensure total parents is always even
+        total_parents += 1
+
+    while len(selected_parents) < total_parents:
+        tournament_size = random.randint(2, len(total_angles)) ######################## THIS SHOULDNT BE RANDOM EVERY TIME ##########################
+        competitors = random.sample(range(len(total_angles)), tournament_size)
+
+        print("Competitors:", competitors)
+
+        competitors.sort(key=lambda x: fitness_scores[x])
+        best = competitors[0]
+
+        if best not in selected_parents:
+            selected_parents.append(best)
+        
+        print("best competitor:", best)
     
-    while len(selected_population) < tournament_size:
-        selection_size = tournament_size // 4
-        
-        while len(index_results) != selection_size:
-            selected_index = random.randint(0, tournament_size-1)
-            if (selected_index not in index_results) and (selected_index not in exclude_indices):
-                index_results.append(selected_index)
+    print("Selected indices:", selected_parents)
 
-        index_results.sort()
-        for i in index_results:
-            ranked_population.append((fitness_scores[i], i))
-        
-        ranked_population.sort()
-        selected_population.append(ranked_population[:2])
-        exclude_indices.append(ranked_population[0][1])
-        exclude_indices.append(ranked_population[1][1])
-        
-        
-            
-    print("ranked population", ranked_population)
-    print("selected population", selected_population)
-    return selected_population
 
+    return selected_parents
+
+def offspring_generation(selected_indices, total_angles):
+    offspring = []
+    
+    for i in range(0, len(selected_indices), 2):
+        parent1 = total_angles[selected_indices[i]]
+        parent2 = total_angles[selected_indices[i+1]]
+        
+        child1, child2 = breeding(parent1, parent2)
+        
+        offspring.append(child1)
+        offspring.append(child2)
+    
+
+    print("Offspring:", offspring)
+    return offspring
+
+def breeding(parent1, parent2):
+    crossover_point = random.randint(1, 23)  # Crossover point between 1 and 23 as the vectors have 24 elements
+
+    child1 = parent1[:crossover_point] + parent2[crossover_point:]
+    child2 = parent2[:crossover_point] + parent1[crossover_point:]
+
+    print("Parent 1:", parent1)
+    print("Parent 2:", parent2)
+
+    print("Crossover point:", crossover_point)
+    print("Child 1:", child1)
+    print("Child 2:", child2)
+    return child1, child2
 
 def animate_frames(frames):
     fig = plt.figure(figsize=(8,8))
@@ -121,15 +150,20 @@ def animate_frames(frames):
 
 def main():
     population_size = 10
-    frame = []
+    best_frame = []
     population = []
     
     animation = []
 
     total_angles = generate_angles(population_size)
     fitness_scores = fitness_function(total_angles)
-    tournament_selection(fitness_scores, population_size)
-    
+    selected_parents = tournament_selection(fitness_scores, total_angles)
+    offspring = offspring_generation(selected_parents, total_angles)
+
+
+    # total_angles = list of 300 frames
+# fitness_scores = corresponding list of fitness values
+
 
     population.append(total_angles)
 
