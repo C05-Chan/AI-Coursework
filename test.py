@@ -37,7 +37,7 @@ def fitness_function(population):
             
         print("legs", legs)
 
-        fitness_score = 7.2  # max fitness
+        fitness_score = 0
         fitness_pos = 0
         fitness_transition = 0
         
@@ -160,12 +160,17 @@ def mutation(offspring):
 
     return offspring
 
-def new_population(selected_parents, offspring):
-    population = []
+def new_population(selected_parents, offspring, population):
+    n_population = []
+    parents = []
     
-    population.append(selected_parents)
-    population.append(offspring)
-    return(population)
+    for r in range(len(selected_parents)):
+        parents.append(population[selected_parents[r]])
+        
+    n_population.extend(parents)
+    n_population.extend(offspring)
+    
+    return n_population 
 
 def animate_frames(frames):
     fig = plt.figure(figsize=(8, 8))
@@ -189,12 +194,12 @@ def animate_frames(frames):
 
         return []
 
-    ani = FuncAnimation(fig, update, frames=len(frames), interval=500)
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=200)
     plt.show()
 
 
 def main():
-    population_size = 2
+    population_size = 4
     best_animation = False
     
     population = generate_angles(population_size)
@@ -205,24 +210,27 @@ def main():
     print("here")
     offspring = offspring_generation(selected_parents, population)
     mutated_offspring = mutation(offspring)
-    population = new_population(selected_parents, mutated_offspring)
+    population = new_population(selected_parents, mutated_offspring, population)
     
     print("new population:", population)
     
-    while best_animation == False:
+    
+    check_best = []
+    while len(check_best) != len(population):
         for _ in range(population_size):
-            if fitness_scores[_] < 5:
+            if fitness_scores[_] > -4.7:
                 fitness_scores = fitness_function(population)
                 selected_parents = tournament_selection(fitness_scores, population)
                 offspring = offspring_generation(selected_parents, population)
                 mutated_offspring = mutation(offspring)
-                population = new_population(selected_parents, mutated_offspring)
-                
-                animate_frames(population)
-                
-        
+                population = new_population(selected_parents, mutated_offspring, population)
             else:
-                best_animation = True
+                check_best.append(fitness_scores[_])
+                
+
+            
+    
+    animate_frames(population)
 
 
     # population = list of 300 frames
