@@ -137,16 +137,55 @@ def breeding(parent1, parent2):
     print("Child 2:", child2)
     return child1, child2
 
+
+def mutation(offspring):
+    mutation_rate = 0.1 # 10% mutation rate
+
+    for individual in offspring:
+        if random.random() < mutation_rate:
+            
+            mutated_index = random.randint(0, len(individual)-1)
+
+            joint = mutated_index % 3
+
+            if joint == 0:#coxa
+                individual[mutated_index] = round(random.uniform(-0.38, 0.38), 3)
+            elif joint == 1:# femur
+                individual[mutated_index] = round(random.uniform(-2, -0.5), 3)
+            else:# tibia
+                individual[mutated_index] = round(random.uniform(-0.5, 0), 3)
+
+    print("Mutated Offspring:", offspring)
+    print(len(offspring))
+
+    return offspring
+
+
 def animate_frames(frames):
-    fig = plt.figure(figsize=(8,8))
+    fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111, projection='3d')
 
+    # Set fixed axis limits so animation does not jitter
+    ax.set_xlim(-10, 10)
+    ax.set_ylim(-10, 10)
+    ax.set_zlim(0, 10)
+
     def update(i):
+        ax.cla()  # clear old frame
+
+        # Keep limits every frame
+        ax.set_xlim(-10, 10)
+        ax.set_ylim(-10, 10)
+        ax.set_zlim(0, 10)
+
         plot_spider_pose(ax, frames[i])
+        ax.set_title(f"Frame {i}")
+
         return []
 
-    ani = FuncAnimation(fig, update, frames=len(frames), interval=500)
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=200)
     plt.show()
+
 
 def main():
     population_size = 10
@@ -159,6 +198,7 @@ def main():
     fitness_scores = fitness_function(total_angles)
     selected_parents = tournament_selection(fitness_scores, total_angles)
     offspring = offspring_generation(selected_parents, total_angles)
+    mutated_offspring = mutation(offspring)
 
 
     # total_angles = list of 300 frames
@@ -169,7 +209,8 @@ def main():
 
     angles_frame = []
 
-    # animate_frames(angles_frame)
+    animate_frames(total_angles)
+
     
 
     # animate_frames(population[0])
