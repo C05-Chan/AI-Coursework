@@ -104,15 +104,16 @@ def roulette_selection(ranked_population):#
         pre_nums += normalised_nums[i]
 
     
-    for i in range(len(cumulative_sum)): # loops for frames
+    for i in range(len(ranked_population)): # loops for frames
         selected = random.random() # selects individual
-        for x in range(len(cumulative_sum)): # loops to check what individual is selected
+        for x in range(len(ranked_population)): # loops to check what individual is selected
             if selected < cumulative_sum[x][0]:
                 if x == 0:
                     selected_cromosones.append(cumulative_sum[x]) 
                 elif x == len(cumulative_sum):
                     selected_cromosones.append(cumulative_sum[x]) 
-                selected_cromosones.append(cumulative_sum[x-1]) 
+                else:
+                    selected_cromosones.append(cumulative_sum[x-1]) 
                 break
     
     # scaleing check
@@ -166,8 +167,8 @@ def animate_frames(frames):
 
 def main():
     #GA parameters
-    mutation_rate = 0
-    population_size = 100 # heavy effect
+    mutation_rate = 0.01
+    population_size = 1000 # heavy effect
     generations = 100 #medium effect
     frames = 100 # heavy effect
     
@@ -216,15 +217,15 @@ def main():
             selected = roulette_selection(fitness) 
 
             # getting best Frame per gen
-            for x in range(len(fitness)): 
+            for x in range(len(fitness)):                 
                 if fitness[x][0] < best_fit[0]:
                     best_fit = fitness[x]
             fitness = []
             # #print("select: COMPLETE")
 
             #offspring function not edited (output checked)
-            for x in range(round(len(selected)/2)): # loops animations
-                    parent= math.floor(len(selected)/2)
+            for x in range(round(len(selected)/2)): # loops for first half of frames
+                    parent= math.floor(len(selected)/2) # indexes last half of frames
                     children = breeding(selected[x][1], selected[parent+x][1])
                     offspring.append(children[0])
                     offspring.append(children[1])
@@ -234,9 +235,9 @@ def main():
             # print(len(offspring))
 
             #mutation function
-            # population = []
-            # population = mutation(offspring, mutation_rate) #issue
-            # offspring = []
+            population = []
+            population = mutation(offspring, mutation_rate)
+            offspring = []
             #print("mutation: COMPLETE")
 
 
