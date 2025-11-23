@@ -117,22 +117,20 @@ def roulette_selection(ranked_population):#
                 break
     
     # scaleing check
-    # num = 0
-    # output= []
-    # for i in range(len(cumulative_sum)):
-    #     for x in range(len(cumulative_sum)):
-    #         if cumulative_sum[i][0] == selected_cromosones[x][0]:
-    #             num += 1
-    #     if i == len(cumulative_sum)-1:
-    #         if num > 0:
-    #             output.append([abs(cumulative_sum[i-1][0] - cumulative_sum[i][0]),num])
-    #     else:
-    #         if num > 0:
-    #             output.append([cumulative_sum[i+1][0] - cumulative_sum[i][0] , num])
-    #     num = 0
-    # output.sort()
-    # for i in range(len(output)):
-    #     print(output[i])
+    num = 0
+    output= []
+    for i in range(len(cumulative_sum)):
+        for x in range(len(cumulative_sum)):
+            if cumulative_sum[i][0] == selected_cromosones[x][0]:
+                num += 1
+        if i == len(cumulative_sum)-1:
+            output.append([abs(cumulative_sum[i-1][0] - cumulative_sum[i][0]),num])
+        else:
+            output.append([cumulative_sum[i+1][0] - cumulative_sum[i][0] , num])
+        num = 0
+    output.sort()
+    for i in range(len(output)):
+        print(output[i])
     return(selected_cromosones)
 
 def mutation(population, mutation_rate): # mutates random angles in all frames in mutaion_rate(0.01) % of the population
@@ -168,9 +166,9 @@ def animate_frames(frames):
 def main():
     #GA parameters
     mutation_rate = 0.01
-    population_size = 1000 # heavy effect
-    generations = 100 #medium effect
-    frames = 100 # heavy effect
+    population_size = 100 # very heavy effect
+    generations = 10 #medium effect
+    frames = 300 # heavy effect
     
     temp =[]
     population = []
@@ -242,24 +240,36 @@ def main():
 
 
         frame_end = time.time()
-        for i in range(len(aimed_start_pos)):
-            if i+1 > len(aimed_start_pos)/2:
-                if aimed_start_pos[i] >= 0.38:
-                    switch[i] = -0.0174533
-                elif aimed_start_pos[i] <= -0.38:
-                    switch[i] =  0.0174533
-                aimed_start_pos[i] += switch[i]
+        for i in range(8):
+            if i*3 > 4:
+                if aimed_start_pos[i*3] >= 0.38:
+                    switch[i*3] = -0.0174533
+                elif aimed_start_pos[i*3] <= -0.38:
+                    switch[i*3] =  0.0174533
+
+                if aimed_start_pos[i*3+1] >= -0.5:
+                    switch[i*3+1] = -0.0174533
+                elif aimed_start_pos[i*3+1] <= -2:
+                    switch[i*3+1] = 0.0174533
+                aimed_start_pos[i*3] += switch[i*3]
+                aimed_start_pos[i*3+1] -= switch[i*3+1]
 
             else:
-                if aimed_start_pos[i] >= 0.38:
+                if aimed_start_pos[i*3] >= 0.38:
                     switch[i] = 0.0174533
-                elif aimed_start_pos[i] <= -0.38:
+                elif aimed_start_pos[i*3] <= -0.38:
                     switch[i] =  -0.0174533
-                aimed_start_pos[i] -= switch[i]
+                
+                if aimed_start_pos[i*3+1] >= -0.5:
+                    switch[i*3+1] = 0.0174533
+                elif aimed_start_pos[i*3+1] <= -2:
+                    switch[i*3+1] = -0.0174533
+                aimed_start_pos[i*3] -= switch[i*3]
+                aimed_start_pos[i*3+1] -= switch[i*3+1]
 
         # aimed_start_pos = list(best_fit[1])
         temp.append(list(aimed_start_pos))
-        animation.append(list(best_fit[1]))
+        animation.append(list(aimed_start_pos))#list(best_fit[1]))
         best_fit = [1000,[]]
 
     program_run_end = time.time()
