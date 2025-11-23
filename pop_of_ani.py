@@ -1,6 +1,6 @@
 import random
-import time
 import math
+import time
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from spider_plot import plot_spider_pose, forward_leg_kinematics2
@@ -18,14 +18,78 @@ def generate_angles(): # generates 1 animation (300 frames)
 
     return(gaits)
 
-def fitness_function(prev,frame):#this calculates a how good the frame fits to the previous frame with a slight difference (NEEDS RE-WRITEING DESPERATLY)
+def fitness_function(prev,current):#this calculates a how good the frame fits to the previous frame with a slight difference (NEEDS RE-WRITEING DESPERATLY)
     fitness = 0
-    for i in range(len(prev)):
-        if prev[i] < frame[i]:
-            fitness += pow((prev[i] - frame[i] - 0.2),(4-i)) 
-        else:
-            fitness += pow((prev[i] - frame[i] + 0.2),(4-i))
+    max_angles = [0.38,-0.5,-0.5]
+    min_angles = [-0.38,-2,0]
+    for i in range(len(prev)): #loops 24 times
+        for x in range(8):
+            curent_coxa = current[x*3]
+            current_femer = current[x*3+1]
+            current_tibia = current[x*3+2]
+            prev_coxa = prev[x*3]
+            prev_femer = prev[x*3+1]
+            prec_tibia = prev[x*3+2]
+            #checks coxa
+            if curent_coxa < max_angles[0]:
+                if prev_coxa - curent_coxa < 0.02:
+                    fitness += curent_coxa
+                else:
+                    fitness -= curent_coxa 
 
+                #checks second part of leg
+                if current_femer < max_angles[1]:
+                    if prev_femer - current_femer < 0.02:
+                        fitness += current_femer
+                        
+                    else:
+                        fitness -= current_femer
+
+                    #checks third part of leg
+
+                    if prev_femer - current_tibia < 0.02:
+                        fitness += current_tibia
+                        
+                    else:
+                        fitness -= current_tibia
+
+
+
+                else:
+                    fitness -= current_femer
+
+
+            elif curent_coxa > min_angles[0]:
+                if prev_coxa - curent_coxa > -0.02:
+                    fitness += curent_coxa
+                else:
+                    fitness -= curent_coxa
+
+                #checks second part of leg
+                if current_femer > min_angles[1]:
+                    if prev_femer - current_femer < 0.02:
+                        fitness += current_femer
+                    else:
+                        fitness -= current_femer
+                    
+                    #checks third part of leg
+                    #if current_tibia < (current_femer*0.1):
+                    if prev_femer - current_tibia < 0.02:
+                        fitness += current_tibia
+                    
+                    else:
+                        fitness -= current_tibia
+
+                else:
+                    fitness -= current_femer
+                
+            else:
+                fitness -= curent_coxa
+            
+            #checks third part of leg
+            if current_tibia < (current_femer*0.1):
+                fitness += current_tibia
+            
     return fitness
 
 def breeding(prev,frame): #cuts two animations at random spots and combines them
@@ -42,7 +106,7 @@ def breeding(prev,frame): #cuts two animations at random spots and combines them
     for i in range(len(prevA)): 
         frameB.append(prevA[i])
 
-    return frameA, frameB  
+    return prev, frame 
      
 def roulette_selection(ranked_population): # tournament style selection output 3 chromosones ' add 2 training dummys 1000 and 1 value
     total_sum = 0
@@ -83,7 +147,7 @@ def mutation(population, mutation_rate): # mutates random angles in all frames i
 
                 for y in range(len(mutated_offspring)): #goes through angles (24)
                     if random.randint(0,1) == 1:
-                        mutated_offspring[y] = (round(random.random(),2))
+                        mutated_offspring[y] += (round(random.uniform(-0.02,0.02),2))
 
                 population[i][x] = mutated_offspring
                 mutated_offspring = []
@@ -98,15 +162,15 @@ def animate_frames(frames):
         plot_spider_pose(ax, frames[i])
         return []
 
-    ani = FuncAnimation(fig, update, frames=len(frames), interval=500)
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=200)
     plt.show()
 
 
 def main():
     #GA parameters
     mutation_rate = 0.01
-    population_size = 800
-    generations = 100
+    population_size = 1000
+    generations = 1000
 
     animation_fitness = 0
     population = []
@@ -121,7 +185,7 @@ def main():
     for i in range(population_size):
         population.append(generate_angles())
 
-    #generation loop        
+    #generation loop
     gen_start = time.time()
     for i in range(generations):
         gen_time = gen_end - gen_start
@@ -134,31 +198,31 @@ def main():
                 if y != len(population[0])-1:
                     animation_fitness += fitness_function(population[x][y], population[x][y+1])
             fitness.append([animation_fitness, population[x]])
-        print("Fitness: COMPLETE")
+        print("fitness: COMPLETE")
 
         #selection function
         selected = roulette_selection(fitness)
         for x in range(len(fitness)): # getting best fit animation over entire program run
-            if fitness[i][0] >= best_fit[0]:
-                best_fit = fitness[i]
+            if fitness[x][0] <= best_fit[0]:
+                best_fit = fitness[x]
         fitness = []
-        print("Select: COMPLETE")
+        print("select: COMPLETE")
 
         #offspring function
         for x in range(round(len(selected)/2)): # loops animations
                 if x != len(selected)-1:
                     offspring.append(breeding(selected[x][1], selected[x+1][1])[0])
                     offspring.append(breeding(selected[x][1], selected[x+1][1])[1])
-        print("Offspring: COMPLETE")
+        print("offspring: COMPLETE")
 
         #mutation function
         population = []
         population = mutation(offspring, mutation_rate)
         offspring = []
-        print("Mutation: COMPLETE")
+        print("mutation: COMPLETE")
         gen_end = time.time()
     program_run_end = time.time()
-    print("FIN! Runtime: ", round(program_run_end - program_run_start,3),"sec")
+    print("fin! Runtime: ", round(program_run_end - program_run_start,3),"sec")
     
     #animate function
     for i in range(len(best_fit[1])): 
