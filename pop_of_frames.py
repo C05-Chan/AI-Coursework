@@ -39,31 +39,31 @@ def fitness_function(population, aimed_start_pos):#
         
         #smoothness check
         for x in range(24):
-            #leg crossing prevention + L/R leg target agustment
-            if population[i][x]>0.36:
-                fit -= abs(legs[i][0] - aimed_start_pos[x]+target_movment)
-                break
-            elif population[i][x]<-0.36:
-                fit -= abs(legs[i][0] + aimed_start_pos[x]+target_movment)
-                break
+            # #leg crossing prevention + L/R leg target agustment
+            # if population[i][x]>0.38:
+            #     fit += abs(population[i][x] - aimed_start_pos[x]+target_movment)
+            #     break
+            # elif population[i][x]<-0.38:
+            #     fit += abs(population[i][x] + aimed_start_pos[x]+target_movment)
+            #     break
 
-            if population[i][x]>0.36:
-                target_movment = -0.0174533 # about -1 degree
-            elif population[i][x]<-0.36:
-                target_movment = 0.0174533 # about +1 degree
-            else:
-                target_movment = 0.0174533
+            # if population[i][x]>0.38:
+            #     target_movment = -0.0174533 # about -1 degree
+            # elif population[i][x]<-0.38:
+            #     target_movment = 0.0174533 # about +1 degree
+            # else:
+            #     target_movment = 0.0174533
 
                 
 
-            fit += abs(population[i][x] - aimed_start_pos[x]+target_movment)
+            fit += abs(population[i][x] - aimed_start_pos[x])
         smoothness_fit.insert(i,fit)
         fit = 0
     
     for i in range(len(population)):
         fitness.append([(smoothness_fit[i]),population[i]])
 
-# simitery_fit[i]+
+#simitery_fit[i]+
             
     return fitness
 
@@ -134,10 +134,6 @@ def roulette_selection(ranked_population):#
     #     print(output[i])
     return(selected_cromosones)
 
-
-
-    return selected
-
 def mutation(population, mutation_rate): # mutates random angles in all frames in mutaion_rate(0.01) % of the population
     total_mut = 0
     mutated_offspring = []
@@ -171,10 +167,11 @@ def animate_frames(frames):
 def main():
     #GA parameters
     mutation_rate = 0
-    population_size = 1000 # heavy effect
-    generations = 200 #medium effect
+    population_size = 100 # heavy effect
+    generations = 100 #medium effect
     frames = 100 # heavy effect
     
+    temp =[]
     population = []
     fitness = []
     offspring = []
@@ -244,30 +241,28 @@ def main():
 
 
         frame_end = time.time()
-        for i in range(len(best_fit)):
-            best_fit[1][i]+= 0.0174533
-            if i+1 > len(best_fit)/2:
-                if best_fit[1][i] >= 0.38:
+        for i in range(len(aimed_start_pos)):
+            if i+1 > len(aimed_start_pos)/2:
+                if aimed_start_pos[i] >= 0.38:
                     switch[i] = -0.0174533
-                elif best_fit[1][i] <= -0.38:
+                elif aimed_start_pos[i] <= -0.38:
                     switch[i] =  0.0174533
-                
-                best_fit[1][i] += switch[i]
-            else:
-                if best_fit[i] >= 0.38:
-                    switch[i] = 0.0174533
-                elif best_fit[i] <= -0.38:
-                    switch[i] =  -0.0174533
-                best_fit[i] -= switch[i]
+                aimed_start_pos[i] += switch[i]
 
-        aimed_start_pos = list(best_fit[1])
+            else:
+                if aimed_start_pos[i] >= 0.38:
+                    switch[i] = 0.0174533
+                elif aimed_start_pos[i] <= -0.38:
+                    switch[i] =  -0.0174533
+                aimed_start_pos[i] -= switch[i]
+
+        # aimed_start_pos = list(best_fit[1])
+        temp.append(list(aimed_start_pos))
         animation.append(list(best_fit[1]))
         best_fit = [1000,[]]
 
     program_run_end = time.time()
     print("fin! Runtime: ", round(program_run_end - program_run_start,3),"sec")
-
-
 
     #animate function
     for i in range(len(animation)): 
