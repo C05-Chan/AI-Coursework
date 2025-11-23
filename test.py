@@ -83,6 +83,8 @@ def fitness_function(population):
 
 
 def tournament_selection(fitness_scores, population):
+    print("ENTER tournament_selection")
+
     selected_parents = []
 
     total_parents = len(population) // 2
@@ -104,10 +106,12 @@ def tournament_selection(fitness_scores, population):
         
     #     print("best competitor:", best)
     
-    # print("Selected indices:", selected_parents)
+    print("Selected indices:", selected_parents)
+    
     return selected_parents
 
 def offspring_generation(selected_parents, population):
+    print("ENTER offspring_generation")
     offspring = []
     
     for i in range(0, len(selected_parents), 2):
@@ -120,7 +124,7 @@ def offspring_generation(selected_parents, population):
         offspring.append(child2)
     
 
-    # print("Offspring:", offspring)
+    print("Offspring:", offspring)
     return offspring
 
 def breeding(parent1, parent2):
@@ -139,6 +143,7 @@ def breeding(parent1, parent2):
 
 
 def mutation(offspring):
+    print("ENTER mutation")
     mutation_rate = 0.1 # 10% mutation rate
 
     for individual in offspring:
@@ -193,15 +198,20 @@ def main():
     best_animation = False
     
     population = generate_angles(population_size)
+    print("Generated population:", population)
+    
     fitness_scores = fitness_function(population)
     selected_parents = tournament_selection(fitness_scores, population)
+    print("here")
     offspring = offspring_generation(selected_parents, population)
     mutated_offspring = mutation(offspring)
     population = new_population(selected_parents, mutated_offspring)
     
+    print("new population:", population)
+    
     while best_animation == False:
         for _ in range(population_size):
-            if fitness_scores[_] > 9999:
+            if fitness_scores[_] < 5:
                 fitness_scores = fitness_function(population)
                 selected_parents = tournament_selection(fitness_scores, population)
                 offspring = offspring_generation(selected_parents, population)
