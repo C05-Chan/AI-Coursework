@@ -19,76 +19,7 @@ def generate_angles(): # generates 1 animation (300 frames)
     return(gaits)
 
 def fitness_function(prev,current):#this calculates a how good the frame fits to the previous frame with a slight difference (NEEDS RE-WRITEING DESPERATLY)
-    fitness = 0
-    max_angles = [0.38,-0.5,-0.5]
-    min_angles = [-0.38,-2,0]
-    for i in range(len(prev)): #loops 24 times
-        for x in range(8):
-            curent_coxa = current[x*3]
-            current_femer = current[x*3+1]
-            current_tibia = current[x*3+2]
-            prev_coxa = prev[x*3]
-            prev_femer = prev[x*3+1]
-            prec_tibia = prev[x*3+2]
-            #checks coxa
-            if curent_coxa < max_angles[0]:
-                if prev_coxa - curent_coxa < 0.02:
-                    fitness += curent_coxa
-                else:
-                    fitness -= curent_coxa 
-
-                #checks second part of leg
-                if current_femer < max_angles[1]:
-                    if prev_femer - current_femer < 0.02:
-                        fitness += current_femer
-                        
-                    else:
-                        fitness -= current_femer
-
-                    #checks third part of leg
-
-                    if prev_femer - current_tibia < 0.02:
-                        fitness += current_tibia
-                        
-                    else:
-                        fitness -= current_tibia
-
-
-
-                else:
-                    fitness -= current_femer
-
-
-            elif curent_coxa > min_angles[0]:
-                if prev_coxa - curent_coxa > -0.02:
-                    fitness += curent_coxa
-                else:
-                    fitness -= curent_coxa
-
-                #checks second part of leg
-                if current_femer > min_angles[1]:
-                    if prev_femer - current_femer < 0.02:
-                        fitness += current_femer
-                    else:
-                        fitness -= current_femer
-                    
-                    #checks third part of leg
-                    #if current_tibia < (current_femer*0.1):
-                    if prev_femer - current_tibia < 0.02:
-                        fitness += current_tibia
-                    
-                    else:
-                        fitness -= current_tibia
-
-                else:
-                    fitness -= current_femer
-                
-            else:
-                fitness -= curent_coxa
-            
-            #checks third part of leg
-            if current_tibia < (current_femer*0.1):
-                fitness += current_tibia
+        
             
     return fitness
 
