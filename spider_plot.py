@@ -101,7 +101,7 @@ def plot_spider_pose(ax, angles):
     ax.set_ylim([-4,4])
     ax.set_zlim([-2,2])
     ax.set_xlabel("X"); ax.set_ylabel("Y"); ax.set_zlabel("Z")
-    ax.view_init(elev=30, azim=45)#0,0,0)#elev=30, azim=45)#0,90)
+    ax.view_init(90,0)#0,0,0)#elev=30, azim=45)#0,90)
     ax.grid(True)
 
     # draw body
@@ -126,7 +126,7 @@ def plot_spider_pose(ax, angles):
                                                  segment_lengths)
 
         ax.plot([j1[0], j2[0]], [j1[1], j2[1]], [j1[2], j2[2]], 'k')
-        ax.plot([j2[0], j3[0]], [j2[1], j3[1]], [j2[2], j3[2]], 'b')
-        ax.plot([j3[0], j4[0]], [j3[1], j4[1]], [j3[2], j4[2]], 'r')
-        ax.scatter([j4[0]], [j4[1]], [j4[2]], c='r', s=30)
+        # ax.plot([j2[0], j3[0]], [j2[1], j3[1]], [j2[2], j3[2]], 'b')
+        # ax.plot([j3[0], j4[0]], [j3[1], j4[1]], [j3[2], j4[2]], 'r')
+        # ax.scatter([j4[0]], [j4[1]], [j4[2]], c='r', s=30)
 

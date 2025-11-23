@@ -40,23 +40,23 @@ def fitness_function(population, aimed_start_pos):#
         #smoothness check
         for x in range(24):
             #leg crossing prevention + L/R leg target agustment
-            if population[i][x]>0.36:
-                fit -= abs(legs[i][0] - aimed_start_pos[x]+target_movment)
+            if population[i][x] > 0.36:
+                fit += abs(legs[i][0] - aimed_start_pos[x]+target_movment)
                 break
-            elif population[i][x]<-0.36:
-                fit -= abs(legs[i][0] + aimed_start_pos[x]+target_movment)
+            elif population[i][x] < -0.36:
+                fit += abs(legs[i][0] + aimed_start_pos[x]+target_movment)
                 break
 
-            if population[i][x]>0.36:
+            if population[i][x] > 0.36:
                 target_movment = -0.0174533 # about -1 degree
-            elif population[i][x]<-0.36:
+            elif population[i][x] < -0.36:
                 target_movment = 0.0174533 # about +1 degree
             else:
                 target_movment = 0.0174533
 
                 
 
-            fit += abs(population[i][x] - aimed_start_pos[x]+target_movment)
+            fit += population[i][x] - aimed_start_pos[x] + target_movment
         smoothness_fit.insert(i,fit)
         fit = 0
     
@@ -90,14 +90,14 @@ def roulette_selection(ranked_population):#
     cumulative_sum = []
     selected_cromosones = []
     for i in range(len(ranked_population)):
-        #scores = [ranked_population[i][0]]
-        total_sum += ranked_population[i][0]
+        scores = [1/(1+fit) for fit, cromo in ranked_population]
+        #total_sum += ranked_population[i][0]
 
-    #total_sum = sum(scores)
+    total_sum = sum(scores)
 
     for i in range(len(ranked_population)):
-        #normalised_nums = [s / total_sum for s in scores]
-        normalised_nums.append(ranked_population[i][0]/ total_sum)
+        normalised_nums = [s / total_sum for s in scores]
+        #normalised_nums.append(ranked_population[i][0]/ total_sum)
 
     for i in range(len(normalised_nums)):
         cumulative_sum.append([normalised_nums[i] + pre_nums, ranked_population[i][1]])
@@ -112,10 +112,11 @@ def roulette_selection(ranked_population):#
                     selected_cromosones.append(cumulative_sum[x]) 
                 elif x == len(cumulative_sum):
                     selected_cromosones.append(cumulative_sum[x]) 
-                selected_cromosones.append(cumulative_sum[x-1]) 
+                else:
+                    selected_cromosones.append(cumulative_sum[x-1]) 
                 break
     
-    # scaleing check
+    #scaleing check
     # num = 0
     # output= []
     # for i in range(len(cumulative_sum)):
@@ -123,11 +124,10 @@ def roulette_selection(ranked_population):#
     #         if cumulative_sum[i][0] == selected_cromosones[x][0]:
     #             num += 1
     #     if i == len(cumulative_sum)-1:
-    #         if num > 0:
-    #             output.append([abs(cumulative_sum[i-1][0] - cumulative_sum[i][0]),num])
+    #         output.append([abs(cumulative_sum[i-1][0] - cumulative_sum[i][0]),num])
     #     else:
-    #         if num > 0:
-    #             output.append([cumulative_sum[i+1][0] - cumulative_sum[i][0] , num])
+
+    #         output.append([cumulative_sum[i+1][0] - cumulative_sum[i][0] , num])
     #     num = 0
     # output.sort()
     # for i in range(len(output)):
@@ -167,28 +167,17 @@ def animate_frames(frames):
     ani = FuncAnimation(fig, update, frames=len(frames), interval=100)
     plt.show()
 
-
 def main():
     #GA parameters
-    mutation_rate = 0
-    population_size = 1000 # heavy effect
-    generations = 200 #medium effect
-    frames = 100 # heavy effect
+    frames = 100
     
-    population = []
-    fitness = []
-    offspring = []
-    angles_frame = []
-    aimed_start_pos = []
     switch = []
-    best_fit = [1000,[]]
+    angles_frame = []
+    best_fit = []
     animation = []
     frame_end = 0
     program_run_start = time.time()
 
-    #initial generation function
-    for i in range(population_size):
-        population.append(generate_frame())
 
     frame_start = time.time()
     for f in range(frames):
@@ -196,63 +185,29 @@ def main():
         print("frame: ",f," ", round(frame_time,2) , "sec ", "Program End Eta: ", f"{math.floor(frame_time*(frames-f)/60)}.{round(frame_time*(frames-f)%60)}" , "mins")
         frame_start = time.time()
 
-        if len(aimed_start_pos) == 0:
+        if len(best_fit) == 0:
             for i in range(8):
                 if i < 4:
-                    aimed_start_pos.append(0.38)
+                    best_fit.append(0.38)
                 else:
-                    aimed_start_pos.append(-0.38)
-                aimed_start_pos.append(-0.785)
-                aimed_start_pos.append(-1.570)
+                    best_fit.append(-0.38)
+                best_fit.append(-0.785)
+                best_fit.append(-1.570)
                 switch.append(0.0174533)
                 switch.append(0.0174533)
                 switch.append(0.0174533)
-
-        #generation loop
-        
-        for i in range(generations):
-            #fitness function edited
-            fitness = (fitness_function(population,aimed_start_pos)) 
-            #print("fitness: COMPLETE")
-
-            #selection function not edited (function checked)
-            selected = roulette_selection(fitness) 
-
-            # getting best Frame per gen
-            for x in range(len(fitness)): 
-                if fitness[x][0] < best_fit[0]:
-                    best_fit = fitness[x]
-            fitness = []
-            # #print("select: COMPLETE")
-
-            #offspring function not edited (output checked)
-            for x in range(round(len(selected)/2)): # loops animations
-                    parent= math.floor(len(selected)/2)
-                    children = breeding(selected[x][1], selected[parent+x][1])
-                    offspring.append(children[0])
-                    offspring.append(children[1])
-            selected = []
-            #print("offspring: COMPLETE")
-            # print(offspring)
-            # print(len(offspring))
-
-            #mutation function
-            # population = []
-            # population = mutation(offspring, mutation_rate) #issue
-            # offspring = []
-            #print("mutation: COMPLETE")
 
 
         frame_end = time.time()
+        
         for i in range(len(best_fit)):
-            best_fit[1][i]+= 0.0174533
             if i+1 > len(best_fit)/2:
-                if best_fit[1][i] >= 0.38:
+                if best_fit[i] >= 0.38:
                     switch[i] = -0.0174533
-                elif best_fit[1][i] <= -0.38:
+                elif best_fit[i] <= -0.38:
                     switch[i] =  0.0174533
                 
-                best_fit[1][i] += switch[i]
+                best_fit[i] += switch[i]
             else:
                 if best_fit[i] >= 0.38:
                     switch[i] = 0.0174533
@@ -260,9 +215,7 @@ def main():
                     switch[i] =  -0.0174533
                 best_fit[i] -= switch[i]
 
-        aimed_start_pos = list(best_fit[1])
-        animation.append(list(best_fit[1]))
-        best_fit = [1000,[]]
+        animation.append(list(best_fit))
 
     program_run_end = time.time()
     print("fin! Runtime: ", round(program_run_end - program_run_start,3),"sec")

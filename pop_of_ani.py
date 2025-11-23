@@ -169,8 +169,8 @@ def animate_frames(frames):
 def main():
     #GA parameters
     mutation_rate = 0.01
-    population_size = 1000
-    generations = 1000
+    population_size = 10
+    generations = 1
 
     animation_fitness = 0
     population = []
