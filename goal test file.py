@@ -200,20 +200,20 @@ def main():
 
         frame_end = time.time()
         
-        for i in range(len(best_fit)):
-            if i+1 > len(best_fit)/2:
-                if best_fit[i] >= 0.38:
-                    switch[i] = -0.0174533
-                elif best_fit[i] <= -0.38:
-                    switch[i] =  0.0174533
+        # for i in range(len(best_fit)):
+        #     if i+1 > len(best_fit)/2:
+        #         if best_fit[i] >= 0.38:
+        #             switch[i] = -0.0174533
+        #         elif best_fit[i] <= -0.38:
+        #             switch[i] =  0.0174533
                 
-                best_fit[i] += switch[i]
-            else:
-                if best_fit[i] >= 0.38:
-                    switch[i] = 0.0174533
-                elif best_fit[i] <= -0.38:
-                    switch[i] =  -0.0174533
-                best_fit[i] -= switch[i]
+        #         best_fit[i] += switch[i]
+        #     else:
+        #         if best_fit[i] >= 0.38:
+        #             switch[i] = 0.0174533
+        #         elif best_fit[i] <= -0.38:
+        #             switch[i] =  -0.0174533
+        #         best_fit[i] -= switch[i]
 
         animation.append(list(best_fit))
 
