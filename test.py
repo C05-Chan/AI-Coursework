@@ -1,248 +1,231 @@
 import random
-import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from spider_plot import plot_spider_pose, forward_leg_kinematics2
+from spider_plot import plot_spider_pose
 
+chromosome = 24  # 8 legs * 3 joints
 
-def generate_angles(population_size):
-    gaits = []
-    
-    for x in range(population_size):
-        angles = [] #generates 7200
-        for i in range(8):
-            angles.append(round(random.uniform(-0.38,0.38),3))
-            angles.append(round(random.uniform(-2,-0.5),3))
-            angles.append(round(random.uniform(-0.5,0),3))
-        gaits.append(angles)
+# -----------------------------
+#  Generate initial population
+# -----------------------------
+def generate_gait(population_size, frames):
+    ### This generates a population of random gaits (animations), in each gait there are 300 frames, each frame has 24 joint angles (8 legs * 3 joints)
+    population = []
+    for _ in range(population_size):
+        gait = []
+        for _ in range(frames):
+            frame = []
+            for leg in range(8):
+                frame.append(round(random.uniform(-0.38, 0.38), 3)) #Coxa
+                frame.append(round(random.uniform(-2, -0.5), 3)) #Femur
+                frame.append(round(random.uniform(-0.5, 0), 3)) # Tibia
+            gait.append(frame)
+        population.append(gait)
+    return population
 
-    return(gaits)
-
-
+# -----------------------------
+# Fitness function
+# -----------------------------
 def fitness_function(population):
+    # This function evaluates each gait in the population and assigns a fitness score based on several criteria
+    # Higher fitness is better
+    
+    # Criteria:
+    # 1. If the joint angles are within limits
+    # 2. The smoothness of transitions between frames
+    # 3. Symmetry between left and right legs
+    # 4. If the leg contacts the ground (tibia near zero)
+    
     all_fitness = []
-    
-    print("population", population)
-    
-    max_angles = [0.38,-0.5,-0.5] 
-    min_angles = [-0.38,-2,0]
-    
-    prev_angles = None
-    
-    for frames in population:  
-        ### This sections splits the flat list of 24 angles into 8 legs with 3 angles each ###
-        legs = []
-        for i in range(0, len(frames), 3):
-            legs.append(frames[i:i+3])
-            
-        print("legs", legs)
+    max_symmetry_reward = 0.5
 
-        fitness_score = 0
-        fitness_pos = 0
-        fitness_transition = 0
-        
-        for individual_leg in legs:
-            coxa, femur, tibia = individual_leg
 
-            ## Checks the angles of each leg to see if they are in a legal position or not ##
-            if min_angles[0] < coxa < max_angles[0]:
-                fitness_pos += 0.2
-            if min_angles[1] < femur < max_angles[1]:
-                fitness_pos += 0.2
-            if  min_angles[2] < tibia < max_angles[2]:
-                fitness_pos += 0.2
-                
+    # Define maximum and minimum joint angles for  the Coxa, Femur, Tibia
+    max_angles = [0.38, -0.5, -0.5] 
+    min_angles = [-0.38, -2, 0]
 
-        if prev_angles == None:
-            prev_angles = legs
-        else:
-            for i in range(8):
-                current_coxa, current_femur, current_tibia = legs[i]
-                prev_coxa, prev_femur, prev_tibia = prev_angles[i]
-                
-            # Checks how much the leg has moved from the previous frame to the current frame
-                if abs(current_coxa - prev_coxa) < 0.2:
-                    fitness_transition += 0.1
-                if abs(current_femur - prev_femur) < 0.2:
-                    fitness_transition += 0.1
-                if abs(current_tibia - prev_tibia) < 0.2:
-                    fitness_transition += 0.1
-            
-            
-        
-        # print("fitness pos", fitness_pos)
-        # print("fitness transition", fitness_transition)
-                
-    
-        fitness_score -= (fitness_pos + fitness_transition)
-        all_fitness.append(fitness_score)
-        
-    print("all fitness score", all_fitness)
-    
+    for gait in population:  # gait is a list of frames
+        fitness = 0
+        prev_frame = None
+
+        for frame in gait:  # Split the 24 angles into 8 legs with 3 angles each
+            all_legs = []
+            for leg_index in range(8):
+                start_idx = leg_index * 3 #this gets the Coxa angles, so every 3 in the array
+                end_idx = start_idx + 3 #this gets the Tibia angles
+                leg_angles = frame[start_idx:end_idx]
+                all_legs.append(leg_angles)
+
+            # Check joint limits
+            for leg in all_legs:
+                coxa = leg[0]
+                femur = leg[1]
+                tibia = leg[2]
+
+                if coxa < min_angles[0] or coxa > max_angles[0]:
+                    fitness -= 10
+                if femur < min_angles[1] or femur > max_angles[1]:
+                    fitness -= 10
+                if tibia < min_angles[2] or tibia > max_angles[2]:
+                    fitness -= 10
+
+            # Smooth transitions between frames
+            if prev_frame is not None:
+                for leg_index in range(8):
+                    for joint_index in range(3):
+                        difference = abs(all_legs[leg_index][joint_index] - prev_frame[leg_index][joint_index])
+                        if difference < 0.2:
+                            fitness += 0.1
+            prev_frame = all_legs
+
+            # Symmetry between left and right legs
+            left_indices = [0, 1, 2, 3]
+            right_indices = [4, 5, 6, 7]
+            for symmetry_index in range(4): #4 it is the amount of legs/2
+                left_leg = all_legs[left_indices[symmetry_index]]
+                right_leg = all_legs[right_indices[symmetry_index]]
+
+                diff_sum = 0
+                for joint_idx in range(3):
+                    diff_sum += abs(left_leg[joint_idx] - right_leg[joint_idx])
+
+                symmetry_score = max_symmetry_reward - diff_sum
+
+                if symmetry_score < 0: #make sure its not negative
+                    symmetry_score = 0
+
+                fitness += symmetry_score
+
+            # Ground contact (tibia near zero)
+            for leg in all_legs:
+                tibia = leg[2]
+                if tibia > 0:  #  the leg is floating
+                    fitness -= 20
+
+        all_fitness.append(fitness)
+
     return all_fitness
 
-
+# -----------------------------
+# Tournament selection
+# -----------------------------
 def tournament_selection(fitness_scores, population):
-    print("ENTER tournament_selection")
-
+    
+    tournament_size = 3
+    win_prob=0.75
     selected_parents = []
-
     total_parents = len(population) // 2
 
-    if total_parents % 2 != 0: #ensure total parents is always even
+    # Ensure total_parents is even
+    if total_parents % 2 != 0:
         total_parents += 1
 
     while len(selected_parents) < total_parents:
-        tournament_size = random.randint(2, len(population)) ######################## THIS SHOULDNT BE RANDOM EVERY TIME ##########################
+        # Randomly pick competitors
         competitors = random.sample(range(len(population)), tournament_size)
+        # Sort competitors by fitness (highest first)
+        competitors.sort(key=lambda x: fitness_scores[x], reverse=True)
 
-        # print("Competitors:", competitors)
-
-        competitors.sort(key=lambda x: fitness_scores[x])
-        best = competitors[0]
-
-        if best not in selected_parents:
-            selected_parents.append(best)
-        
-    #     print("best competitor:", best)
-    
-    print("Selected indices:", selected_parents)
-    
+        # Probabilistic winner
+        r = random.random()
+        if r < win_prob:
+            winner = competitors[0]  # strongest wins
+        else:
+            # pick a weaker competitor (could be any other in tournament)
+            winner = random.choice(competitors[1:])
+        if winner not in selected_parents:
+            selected_parents.append(winner)
     return selected_parents
 
-def offspring_generation(selected_parents, population):
-    print("ENTER offspring_generation")
-    offspring = []
-    
-    for i in range(0, len(selected_parents), 2):
-        parent1 = population[selected_parents[i]]
-        parent2 = population[selected_parents[i+1]]
-        
-        child1, child2 = breeding(parent1, parent2)
-        
-        offspring.append(child1)
-        offspring.append(child2)
-    
-
-    print("Offspring:", offspring)
-    return offspring
-
-def breeding(parent1, parent2):
-    crossover_point = random.randint(1, 23)  # Crossover point between 1 and 23 as the vectors have 24 elements
-
-    child1 = parent1[:crossover_point] + parent2[crossover_point:]
-    child2 = parent2[:crossover_point] + parent1[crossover_point:]
-
-    # print("Parent 1:", parent1)
-    # print("Parent 2:", parent2)
-
-    # print("Crossover point:", crossover_point)
-    # print("Child 1:", child1)
-    # print("Child 2:", child2)
+# -----------------------------
+# Crossover
+# -----------------------------
+def breeding(parent1, parent2, frames):
+    crossover_frame = random.randint(1, frames - 1)
+    child1 = parent1[:crossover_frame] + parent2[crossover_frame:]
+    child2 = parent2[:crossover_frame] + parent1[crossover_frame:]
     return child1, child2
 
-
-def mutation(offspring):
-    print("ENTER mutation")
-    mutation_rate = 0.1 # 10% mutation rate
-
-    for individual in offspring:
-        if random.random() < mutation_rate:
-            
-            mutated_index = random.randint(0, len(individual)-1)
-
-
-            individual[mutated_index] = round(random.uniform(2, -2), 3)
-
-
-    # print("Mutated Offspring:", offspring)
-    print(len(offspring))
-
+def offspring_generation(selected_parents, population, frames):
+    offspring = []
+    for i in range(0, len(selected_parents), 2):
+        p1 = population[selected_parents[i]]
+        p2 = population[selected_parents[i+1]]
+        child1, child2 = breeding(p1, p2, frames)
+        offspring.extend([child1, child2])
     return offspring
 
+# -----------------------------
+# Mutation
+# -----------------------------
+def mutation(offspring, mutation_rate=0.1):
+    for gait in offspring:
+        for frame in gait:
+            if random.random() < mutation_rate:
+                idx = random.randint(0, chromosome - 1)
+                # Determine joint type
+                if idx % 3 == 0:
+                    frame[idx] = round(random.uniform(-0.38, 0.38), 3)
+                elif idx % 3 == 1:
+                    frame[idx] = round(random.uniform(-2, -0.5), 3)
+                else:
+                    frame[idx] = round(random.uniform(-0.5, 0), 3)
+    return offspring
+
+# -----------------------------
+# Create new population
+# -----------------------------
 def new_population(selected_parents, offspring, population):
-    n_population = []
-    parents = []
-    
-    for r in range(len(selected_parents)):
-        parents.append(population[selected_parents[r]])
-        
-    n_population.extend(parents)
-    n_population.extend(offspring)
-    
-    return n_population 
+    new_pop = [population[i] for i in selected_parents]
+    new_pop.extend(offspring)
+    return new_pop[:len(population)]
 
-def animate_frames(frames):
-    fig = plt.figure(figsize=(8, 8))
+# -----------------------------
+# Animation
+# -----------------------------
+def animate_gait(frames):
+    fig = plt.figure(figsize=(8,8))
     ax = fig.add_subplot(111, projection='3d')
-
-    # Set fixed axis limits so animation does not jitter
-    ax.set_xlim(-10, 10)
-    ax.set_ylim(-10, 10)
-    ax.set_zlim(0, 10)
+    ax.set_xlim(-10,10)
+    ax.set_ylim(-10,10)
+    ax.set_zlim(0,10)
 
     def update(i):
-        ax.cla()  # clear old frame
-
-        # Keep limits every frame
-        ax.set_xlim(-10, 10)
-        ax.set_ylim(-10, 10)
-        ax.set_zlim(0, 10)
-
+        ax.cla()
+        ax.set_xlim(-10,10)
+        ax.set_ylim(-10,10)
+        ax.set_zlim(0,10)
         plot_spider_pose(ax, frames[i])
         ax.set_title(f"Frame {i}")
-
         return []
 
-    ani = FuncAnimation(fig, update, frames=len(frames), interval=200)
+    ani = FuncAnimation(fig, update, frames=len(frames), interval= 300)
     plt.show()
 
-
+# -----------------------------
+# Main GA Loop
+# -----------------------------
 def main():
-    population_size = 4
-    best_animation = False
-    
-    population = generate_angles(population_size)
-    print("Generated population:", population)
-    
+    population_size = 10
+    generations = 50
+    frames = 300
+
+    population = generate_gait(population_size, frames)
+
+    for gen in range(generations):
+        fitness_scores = fitness_function(population)
+        selected_parents = tournament_selection(fitness_scores, population)
+        offspring = offspring_generation(selected_parents, population, frames)
+        mutated_offspring = mutation(offspring)
+        population = new_population(selected_parents, mutated_offspring, population)
+        
+        #### This is for monitoring progress ####
+        best_score = max(fitness_scores)
+        print(f"Generation {gen+1}: Best fitness = {best_score:.2f}")
+
+    # Animate the best gait
     fitness_scores = fitness_function(population)
-    selected_parents = tournament_selection(fitness_scores, population)
-    print("here")
-    offspring = offspring_generation(selected_parents, population)
-    mutated_offspring = mutation(offspring)
-    population = new_population(selected_parents, mutated_offspring, population)
-    
-    print("new population:", population)
-    
-    
-    check_best = []
-    while len(check_best) != len(population):
-        for _ in range(population_size):
-            if fitness_scores[_] > -4.7:
-                fitness_scores = fitness_function(population)
-                selected_parents = tournament_selection(fitness_scores, population)
-                offspring = offspring_generation(selected_parents, population)
-                mutated_offspring = mutation(offspring)
-                population = new_population(selected_parents, mutated_offspring, population)
-            else:
-                check_best.append(fitness_scores[_])
-                
-
-            
-    
-    animate_frames(population)
-
-
-    # population = list of 300 frames
-# fitness_scores = corresponding list of fitness values
-
-    animate_frames(population)
-
-    
-
-    # animate_frames(population[0])
-    
-    
-
+    best_gait = population[fitness_scores.index(max(fitness_scores))]
+    animate_gait(best_gait)
 
 main()
