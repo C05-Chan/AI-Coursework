@@ -47,25 +47,31 @@ class Full_NN(object):
     def FF(self,x):     #This method will run the network forward
         out=x           #the input layer output is just the input
         self.out[0]=x   #begin the linking of outputs to the class variable for back propagation. (begin with the input layer.)
-        for i, w in enumerate(self.W):  #go through (iterate) the network layers via the weights variable
-            Xnext=np.dot(out, w)        #calculate product between weights and output for the next output
-            out=self.sigmoid(Xnext)     #use the activation function as we must per theory.
-            self.out[i+1]=out           #pass the result to the class variable to preserve for later (when we do the back propagation).
+        for i, w in enumerate(self.W):  # go through (iterate) the network layers via the weights variable
+            Xnext = np.dot(out, w)        # calculate product between weights and output for the next output
+            # Use sigmoid on hidden layers, but keep output layer linear so negative targets are representable
+            if i == len(self.W) - 1:
+                out = Xnext
+            else:
+                out = self.sigmoid(Xnext)
+            self.out[i+1] = out           # pass the result to the class variable to preserve for later (when we do the back propagation).
         return out                      #return the outputs of the layers.
     def BP(self, Er):                   #back propagation method. this works by using theOutput Error (Er)  
                                         #to go backwards through the layers and calculate the errors needed to update the Weights.
                                         #this will return the final error of the input.
-        for i in reversed(range(len(self.Der))): #iterate backwards through the layers
-            # based on the back propagation equations
-            # dE/DWi =(y - y[i+1]) S'(x[i+1]) xi
-            
-            out=self.out[i+1] #we get the layer output for the previous layer (we are going in reverse)
-            D=Er*self.sigmoid_Der(out) #apply derivative of activation function to get Delta
-            D_fixed=D.reshape(D.shape[0], -1).T #turn Delta into an array of appropriate size
-            this_out=self.out[i] #current layer output.
-            this_out=this_out.reshape(this_out.shape[0],-1) #reshape as before to get column array suitable for multiplication
-            self.Der[i]=np.dot(this_out, D_fixed) #matrix multiplication and store result
-            Er=np.dot(D, self.W[i].T) #backpropagate error for next iteration
+        for i in reversed(range(len(self.Der))): # iterate backwards through the layers
+            # For the output layer we use a linear activation (derivative = 1).
+            # For hidden layers we use the sigmoid derivative.
+            out = self.out[i+1]  # layer output for this stage
+            if i == len(self.Der) - 1:
+                D = Er  # linear output layer: derivative = 1
+            else:
+                D = Er * self.sigmoid_Der(out)  # apply derivative of activation function to get Delta
+            D_fixed = D.reshape(D.shape[0], -1).T  # turn Delta into an array of appropriate size
+            this_out = self.out[i]  # current layer output.
+            this_out = this_out.reshape(this_out.shape[0], -1)  # reshape to column array for multiplication
+            self.Der[i] = np.dot(this_out, D_fixed)  # matrix multiplication and store result
+            Er = np.dot(D, self.W[i].T)  # backpropagate error for next iteration
  
     def train_nn(self, x, target, epochs, lr): #training the network. The x is an array, the target is an array the epochs is a number and the lr is a number.
         
@@ -105,6 +111,7 @@ class Full_NN(object):
         return msq
     
 def data_generation():
+    # random data generation within some limits
     frame = []
     for i in range(8):
         frame.append(round(random.uniform(-0.38,0.38),3)) # 43 degrees of freedom
@@ -113,23 +120,44 @@ def data_generation():
     return frame
 
 if __name__ == "__main__": #Test what we have done
-    fulldata = [data_generation() for _ in range(10)]
+    fulldata = [data_generation() for _ in range(299)]
     
     
     training_inputs = np.array(fulldata) #PUT TRAINING DATA HERE    this creates a training set of inputs
-    
-    targets = np.array([-0.083, -1.978, -0.176,
-                         -0.332, -1.556, -0.129, 
-                         0.306, -1.865, -0.453, 
-                         0.316, -0.598, -0.113, 
-                         0.34, -0.548, -0.187, 
-                         -0.298, -1.778, -0.129, 
-                         -0.322, -1.769, -0.466, 
-                         -0.365, -1.395, -0.304]) #PUT TRAINING DATA HERE (e.g. a good frame 24)    this creates a training set of outputs
-    print("hi ", targets)
-    nn=Full_NN(24, [4,4,4], 24) #creates a NN with 24 inputs and 1 output
+    # Multiple target frames: we create a small set of ideal frames and cycle
+    # through them so each training sample is paired with one of these targets.
+    list_of_targets = np.asarray([
+        [
+            0.083, -1.978, -0.176,
+            -0.332, -1.556, -0.129,
+            0.306, -1.865, -0.453,
+            0.316, -0.598, -0.113,
+            0.34, -0.548, -0.187,
+            -0.298, -1.778, -0.129,
+            -0.322, -1.769, -0.466,
+            -0.365, -1.395, -0.304
+        ],
+        [
+            0.13, -1.778, -0.376,
+            -0.232, -1.356, -0.329,
+            0.106, -1.565, -0.253,
+            0.216, -0.598, -0.113,
+            0.24, -0.348, -0.187,
+            -0.198, -1.678, -0.129,
+            -0.222, -1.569, -0.466,
+            -0.265, -1.495, -0.304
+        ]
+    ], dtype=float)
 
-    # Diagnostic prints to verify shapes before training
+    # 
+    N = len(training_inputs)
+    K = list_of_targets.shape[0]
+    targets = np.array([list_of_targets[i % K] for i in range(N)])
+    print("list_of_targets.shape:", list_of_targets.shape, "tiled/cycled to targets.shape:", targets.shape)
+    # create network with 24 outputs to match target vectors
+    nn = Full_NN(24, [10,10], 24)
+
+    # prints for testing
     training_inputs = np.asarray(training_inputs)
     print("training_inputs.shape:", training_inputs.shape, "dtype:", training_inputs.dtype)
     print("targets.shape:", np.asarray(targets).shape, "dtype:", np.asarray(targets).dtype)
@@ -141,7 +169,7 @@ if __name__ == "__main__": #Test what we have done
     # Testing data to identify if Network trained well.
     # Use a sample that matches the network input size (24).
     test_input = training_inputs[0]
-    test_target = np.array([targets[0]])
+    test_target = targets[0]  # now a 24-element vector
 
     NN_output = nn.FF(test_input)
 
