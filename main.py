@@ -3,6 +3,7 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from spider_plot import plot_spider_pose, forward_leg_kinematics2
+bestfitness = []
 def generate_frame():
     frame = []  # generates 7200
     for i in range(8):
@@ -71,18 +72,6 @@ def roulette_selection(ranked_population,refe,change): # tournament style select
                 break
     #print("here", len(outpopulation), insgesamt/eh, insgesamtneu/eh)
     return outpopulation
-    sum = 0
-    for i in ranked_population:
-        sum += i[0]
-    avg = sum / len(ranked_population)
-    haha=0
-    for i in range(len(ranked_population)):
-        #print(ranked_population[i][0])
-        if ranked_population[i][0] < avg**(1/2):
-            haha +=1
-
-            outpopulation.append(ranked_population[i][1])
-    print("das kommt", len(ranked_population),haha, avg)
 
 def mutate(population):
     for inv in range(len(population)):
@@ -111,8 +100,15 @@ def animate_frames(frames):
 
 def geneticA(latest_frame, last_change, size=100):
     change = []
-    generations = 1000
-    for i in last_change:
+    generations = 10000
+    boundary = [-0.38, 0.38, -2, -0.5, -0.5, 0]
+    for i in range(len(last_change)):
+        if i%3 == 0:
+
+
+
+
+
         if random.random() < 0.9:
             change.append(i)
         else:
@@ -132,7 +128,8 @@ def geneticA(latest_frame, last_change, size=100):
             fitness = fitness_function(latest_frame, frame, change)
 
             if fitness < 0.7:
-                print("generation",generations)
+                print("generation",["stop",generations])
+                bestfitness.append(["stop",fitness,generations])
                 return frame, change
             if fitness < 7: rated_population.append([fitness, frame])
         population = roulette_selection(rated_population,latest_frame,change)
@@ -146,7 +143,8 @@ def geneticA(latest_frame, last_change, size=100):
         if best[0] > fitness_function(latest_frame,i,change):
             best[0]=fitness_function(latest_frame,i,change)
             best[1]=i
-    print("best",best[0])
+    print("best",["full",best[0]])
+    bestfitness.append(["full",best[0]])
     return best[1], change
 
 
@@ -166,6 +164,9 @@ def main(nn=False):
     #for i in range(len(total_frames)):
        # angles_frame.append(total_frames[i])
     #
+    print(bestfitness, )
+    if nn:
+        return total_frames
     animate_frames(total_frames)
     # animate_frames(population[0])
 
