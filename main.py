@@ -94,30 +94,49 @@ def animate_frames(frames):
         plot_spider_pose(ax, frames[i])
         return []
 
-    ani = FuncAnimation(fig, update, frames=len(frames), interval=500)
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=200)
     plt.show()
 
 
-def geneticA(latest_frame, last_change, size=100):
+def geneticA(latest_frame, last_change, size=1000):
     change = []
-    generations = 10000
+    generations = 100
     boundary = [-0.38, 0.38, -2, -0.5, -0.5, 0]
     for i in range(len(last_change)):
-        if i%3 == 0:
+        bIndex = i%3
+        p=0.05
+        ranges = abs((boundary[bIndex * 2] - boundary[bIndex * 2 + 1])) / 2
 
-
-
-
-
-        if random.random() < 0.9:
-            change.append(i)
+        if random.random() > p and boundary[bIndex*2]<latest_frame[i]<boundary[bIndex*2 + 1]:
+            #if last_change[i] < 0:  # changes direction
+                #a = -1
+            #else:
+                #a = 1
+            change.append(last_change[i])
+            #change.append((random.random() * 0.1 * a))
         else:
-            if i > 0: #changes direction
+            print("change", p)
+            if last_change[i] > 0:  # changes direction
+                a = -1
+            else:
+                a = 1
+            change.append(random.random() * 0.1 * a)
+        '''middle = (boundary[bIndex*2] + boundary[bIndex*2+1]) /2
+        ranges = abs((boundary[bIndex*2]-boundary[bIndex*2+1])) /2
+        distance = abs(middle - latest_frame[i])
+        p = (distance/ranges)**16+0.1
+        print("p",p)
+        if random.random() > p:
+            print("no change",p)
+            change.append((random.uniform(0.05, 0.1) * ranges))
+        else:
+            print("change",p)
+            if last_change[i] > 0: #changes direction
                 a=-1
             else:
                 a=1
-            change.append((random.random()*(0.1) + 0.1)*a)
-    print(change)
+            change.append((random.uniform(0.05, 0.1) * ranges)*a)'''
+
     population = generate_population(size)
     while generations>1:
         generations -= 1
@@ -155,7 +174,7 @@ def main(nn=False):
     latest_frame = generate_frame()
     total_frames = [latest_frame]
     change = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]*3
-    while len(total_frames) < 20:
+    while len(total_frames) < 100:
         print("progress",len(total_frames))
         new_frame, change = geneticA(latest_frame, change)
         total_frames.append(new_frame)
