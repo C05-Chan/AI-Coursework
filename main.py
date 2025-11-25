@@ -3,7 +3,7 @@ import math
 import csv
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from spider_plot import plot_spider_pose, forward_leg_kinematics2
+from spider_plot import plot_spider_pose
 
 best_fitness = []
 
@@ -46,9 +46,9 @@ def fitness_function(reference, candidate, change):
     
     fitness = 0
     for i in range(len(reference)):
-        fitness += abs(reference[i] - candidate[i] - change[i])
+        fitness += ((abs(reference[i] - candidate[i]-change[i]))*100)**2
 
-    return fitness**2
+    return fitness
 
 
 def roulette_selection(ranked_population):
@@ -158,7 +158,7 @@ def change_vector(latest_frame, last_change):
     return change
 
 
-def geneticA(latest_frame, last_change, size=1000):
+def geneticA(latest_frame, last_change, size=100):
     # ================================================== #
     # This is the main function of the genetic Algorithm #
     # ================================================== #
@@ -214,6 +214,7 @@ def main(nn=False):
     latest_frame = generate_frame()
     total_frames = [latest_frame]
 
+    
 
     change = []
     for _ in range(24):
