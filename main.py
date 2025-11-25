@@ -170,31 +170,38 @@ def geneticA(latest_frame, last_change, size=500, generations = 500):
     for _ in range(size):
         population.append(generate_frame())
 
+    avg_fitness_per_gen = []
+
     while generations > 1:
         generations -= 1
 
         rated_population = []
+        total_fitness = 0
+        
         for frame in population:
             fitness = fitness_function(latest_frame, frame, change)
             rated_population.append([fitness, frame])
+            total_fitness += fitness
 
+        avg_fitness_per_gen.append(total_fitness/ len(population)) #stores average fitness for graph
+        
         selected = roulette_selection(rated_population)
-
         population = crossover(selected)
         population = mutate(population)
 
     best = [10000, []]
     for frame in population:
-        if best[0] > fitness_function(latest_frame, frame, change):
-            best[0] = fitness_function(latest_frame, frame, change)
+        fitness_score = fitness_function(latest_frame, frame, change)
+        if best[0] > fitness_score:
+            best[0] = fitness_score
             best[1] = frame
 
     print("best", ["full", best[0]])
     best_fitness.append(["full", best[0]])
-    return best[1], change
+    
+    return best[1], change, avg_fitness_per_gen
 
-
-def animate_frames(frames, speed = 200):
+def animate_frames(frames):
     # ============================================================================== #
     # This is code to visualize the frames and has nothing to do with the actual GA. #
     # ============================================================================== #
@@ -205,38 +212,60 @@ def animate_frames(frames, speed = 200):
         plot_spider_pose(ax, frames[i])
         return []
 
-    ani = FuncAnimation(fig, update, frames=len(frames), speed=200)
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=200)
     plt.show()
 
-
-def main(nn=False):
-    #How fast should the Animation run for?
-    speed = 200
-    #How many frames should the Animation have?
-    amount_frames = 100
+def plot_graph(avg_fitness_across_frames):
+    # Plot average fitness progression across all frames (log scale)
+    plt.figure(figsize=(10,5))
+    plt.plot(avg_fitness_across_frames, label="Average Fitness Across All Frames")
+    plt.yscale("log")
+    plt.xlabel("Generation")
+    plt.ylabel("Average Fitness (log scale)")
+    plt.title("Average Fitness Progression Across All Generations & Frames")
+    plt.legend()
+    plt.show()
     
+def main(nn=False):
+    speed = 200
+    amount_frames = 100
+
     latest_frame = generate_frame()
     total_frames = [latest_frame]
 
     change = [random.choice([-0.1,0.1]) for _ in range(24)]
 
+    all_avg_fitness_gen = []  # stores avg fitness per generation for each frame
 
+    # Run GA for each frame
     while len(total_frames) < amount_frames:
         print("progress", len(total_frames))
-        new_frame, change = geneticA(latest_frame, change, 200, 200)
+        new_frame, change, avg_fitness_per_gen = geneticA(latest_frame, change, 200, 200)
         total_frames.append(new_frame)
         latest_frame = new_frame
-    print("total", total_frames)
 
+        all_avg_fitness_gen.append(avg_fitness_per_gen)
+
+    num_gen = len(all_avg_fitness_gen[0])
+    avg_fitness_frames = []
+
+    for gen in range(num_gen):
+        generation_sum = 0  
+        
+        for frame_avg in all_avg_fitness_gen:
+            generation_sum += frame_avg[gen]  
+            
+        generation_average = generation_sum / len(all_avg_fitness_gen)
+    
+        avg_fitness_frames.append(generation_average)
+
+    # Save frames to CSV
     filename = 'output_data.csv'
-
     try:
         with open(filename, 'w', newline='') as csvfile:
             csv_writer = csv.writer(csvfile)
             csv_writer.writerows(total_frames)
-
         print(f"✅ Successfully wrote data to {filename}")
-
     except Exception as e:
         print(f"❌ An error occurred: {e}")
 
@@ -245,7 +274,8 @@ def main(nn=False):
     if nn:
         return total_frames
 
-    animate_frames(total_frames, speed)
+    animate_frames(total_frames)
+    plot_graph(avg_fitness_frames)
 
 
 main()
