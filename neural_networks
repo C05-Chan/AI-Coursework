@@ -1,0 +1,169 @@
+import numpy as np
+import random
+import csv
+
+#because a lot of data will be needed, we will use a class approach.
+class Full_NN(object):
+#A Multi Layer Neural Network class. We use this as for the way we need to handle the variables is better suited.
+    def __init__(self, X=24, HL=[256,128,64,32], Y=24): #a constructor for some default values.
+        self.X=X    #inputs
+        self.HL=HL  #hidden layers  
+        self.Y=Y    #outputs
+        
+        #setting up class variables for our inputs.
+        
+        L=[X]+HL+[Y]
+        
+        #total number of layers. This creates a representation of the network in the format we need it. 
+        # i.e array of the format [how many inputs, how mnay hidden layers. how many outputs]
+        
+        W=[] #initialize a weight array
+        
+
+        for i in range(len(L)-1): #we want to be able go to the next layer up so we set one minus
+            scale = np.sqrt(2.0 / L[i])  # Kaiming initialization scaling factor
+            w=np.random.rand(L[i], L[i+1]) * scale     #initialize weights with random values scaled appropriately
+            W.append(w)         #add the new values to the array.
+        self.W=W    #links the class variable to the current variable.
+        Der=[]      #initializes a derivative array. used to calculate back propagation.
+                    
+        
+        
+        for i in range(len(L)-1): #same reason as above for every line
+            d=np.zeros((L[i], L[i+1])) #we don't need random values, just to have them ready to be used. we fill up with zeros.
+        
+            Der.append(d)
+        
+        self.Der=Der
+        
+        #we will be passing these here as that way the class variable will keep them for us until we need them.
+        
+        out=[] #initialize output array
+        
+        for i in range(len(L)): #We don't need to go +1. The outputs are straightforward.
+            o=np.zeros(L[i]) #fills with zeros to be used later.
+            out.append(o)
+        
+        self.out=out
+    
+    def FF(self,x):     #Feed-Forward method
+        out=x           #the input layer output is just the input
+        self.out[0]=x   #begin the linking of outputs to the class variable for back propagation. (begin with the input layer.)
+        for i, w in enumerate(self.W):  # go through (iterate) the network layers via the weights variable
+            Xnext = np.dot(out, w)        # calculate product between weights and output for the next output
+            # Use leaky relu on hidden layers, but keep output layer linear so negative targets are representable
+            if i == len(self.W) - 1:
+                out = Xnext
+            else:
+                out = self.leaky_relu(Xnext)
+            self.out[i+1] = out           # pass the result to the class variable to preserve for later (when we do the back propagation).
+        return out                      #return the outputs of the layers.
+    def BP(self, Er):                   #back propagation method. this works by using theOutput Error (Er)  
+                                        #to go backwards through the layers and calculate the errors needed to update the Weights.
+                                        #this will return the final error of the input.
+        for i in reversed(range(len(self.Der))): # iterate backwards through the layers
+            # For the output layer we use a linear activation (derivative = 1).
+            # For hidden layers we use the leaky relu derivative.
+            out = self.out[i+1]  # layer output for this stage
+            if i == len(self.Der) - 1:
+                D = Er  # linear output layer: derivative = 1
+            else:
+                D = Er * self.leaky_relu_der(out)  # apply derivative of activation function to get Delta
+            D_fixed = D.reshape(D.shape[0], -1).T  # turn Delta into an array of appropriate size
+            this_out = self.out[i]  # current layer output.
+            this_out = this_out.reshape(this_out.shape[0], -1)  # reshape to column array for multiplication
+            self.Der[i] = np.dot(this_out, D_fixed)  # matrix multiplication and store result
+            Er = np.dot(D, self.W[i].T)  # backpropagate error for next iteration
+ 
+    def train_nn(self, x, target, epochs, lr): #training the network
+        
+        for i in range (epochs): #training loop for as many epochs as specified
+        
+            S_errors=0 #variable to carry the error to report to the user
+        
+            for j, input in enumerate (x): #iterates through the training data and inputs
+                t=target[j]
+                output=self.FF(input) #use the network calculations for forward calculations.
+                e=t-output #obtain the overall Network output error
+                self.BP(e) # use that error to do the back propagation
+                self.GD(lr) #Do gradient descent
+      
+                S_errors+=self.msqe(t,output) #update the overall error to show the user.
+            # prints average MSE per epoch
+            if len(x) > 0:
+                avg = S_errors / len(x)
+            else:
+                avg = float('nan')
+            print(f"Epoch {i+1}/{epochs} - avg MSQE: {avg:.6f}")
+    
+    def GD(self, lr=0.01): #Gradient descent
+    
+        for i in range(len(self.W)): #go through the weights
+            W=self.W[i]
+            Der=self.Der[i]
+            W+= Der*lr #update the weights by applying the learning rate
+    
+    def leaky_relu(self,x): # activation function (leaky ReLU) alpha 0.01
+        return np.maximum(0.01*x, x)
+    
+    def leaky_relu_der(self, x): #leaky relu function derivative
+        return np.where(x>0, 1, 0.01) 
+    
+    def msqe(self, t, output): #mean square error
+        msq=np.average((t-output)**2)
+    
+        return msq
+
+if __name__ == "__main__": 
+    # getting data from CSV file
+    with open('test_data.csv') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        sequence = [list(map(float, row)) for row in csv_reader]
+
+    seq = np.asarray(sequence)  # shape (T, 24)
+    print("Generated sequence shape:", seq.shape)
+
+    if seq.shape[0] < 5:
+        raise ValueError("Need at least 5 frames to create training inputs / targets")
+
+    M = seq.shape[0] - 4  # number of samples
+    # Assigning first 4 frames to inputs, 5th frame to targets
+    training_inputs = np.hstack([seq[i:i+M] for i in range(4)])  # shape (M, 96)
+    targets = seq[4:4+M]  # shape (M, 24)
+
+    print("Sequence-based 4-frame -> next-frame prediction:")
+    print("  Sequence length:", len(sequence))
+    print("  training_inputs.shape:", training_inputs.shape, "(4 consecutive frames)")
+    print("  targets.shape:", targets.shape, "(next frame)")
+
+    # create network with 96 inputs and 24 outputs
+    nn = Full_NN(96, [128,64,32], 24)
+
+    # prints for testing
+    training_inputs = np.asarray(training_inputs)
+    print("training_inputs.shape:", training_inputs.shape, "dtype:", training_inputs.dtype)
+    print("targets.shape:", np.asarray(targets).shape, "dtype:", np.asarray(targets).dtype)
+    if training_inputs.size:
+        print("first sample shape:", np.asarray(training_inputs[0]).shape)
+
+    nn.train_nn(training_inputs, targets, 100, 0.015) # trains the network and prints per-epoch MSQE
+    
+    # Testing data to identify if Network trained well.
+    # Use a sample that matches the network input size (24).
+
+
+    # For further testing, use newly generated data, putting it in the format of 96-element input array.
+
+    
+    n = random.randint(0, len(training_inputs)-1)
+    test_input = training_inputs[n]   # 1D array of length 96
+    test_target = targets[n]          # corresponding 24-element target
+    NN_output = nn.FF(test_input)
+
+print("=============== Testing the Network Screen Output===============")
+print("Test input shape:", test_input.shape)
+print() 
+print("Target output is ", test_target)
+print()
+print("Neural Network actual output is ", NN_output, "\nthere is an error (not MSQE) of ", test_target-NN_output)
+print("=================================================================")
