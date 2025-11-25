@@ -1,3 +1,9 @@
+# ========================================================================================== #
+#                                                                                            #
+# This code is to plot one frame with angles, not related to GA!                             #
+#                                                                                            #
+# ========================================================================================== #
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from spider_plot import plot_spider_pose, forward_leg_kinematics2
