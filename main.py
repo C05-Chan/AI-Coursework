@@ -46,9 +46,9 @@ def fitness_function(reference, candidate, change):
 
     fitness = 0
     for i in range(len(reference)):
-        fitness += (abs(reference[i] - candidate[i] - change[i])*100)**2
+        fitness += (abs(reference[i] - candidate[i] - change[i]))
 
-    return fitness
+    return fitness**2
 
 
 def roulette_selection(ranked_population):
