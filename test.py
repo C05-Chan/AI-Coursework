@@ -106,9 +106,6 @@ def fitness_function(population):
 
     return all_fitness
 
-# -----------------------------
-# Tournament selection
-# -----------------------------
 def tournament_selection(fitness_scores, population):
     
     tournament_size = 3
@@ -131,15 +128,12 @@ def tournament_selection(fitness_scores, population):
         if r < win_prob:
             winner = competitors[0]  # strongest wins
         else:
-            # pick a weaker competitor (could be any other in tournament)
+            # pick a weaker competitor 
             winner = random.choice(competitors[1:])
         if winner not in selected_parents:
-            selected_parents.append(winner)
+            selected_parents.append(winner)     
     return selected_parents
 
-# -----------------------------
-# Crossover
-# -----------------------------
 def breeding(parent1, parent2, frames):
     crossover_frame = random.randint(1, frames - 1)
     child1 = parent1[:crossover_frame] + parent2[crossover_frame:]
@@ -155,9 +149,7 @@ def offspring_generation(selected_parents, population, frames):
         offspring.extend([child1, child2])
     return offspring
 
-# -----------------------------
-# Mutation
-# -----------------------------
+
 def mutation(offspring, mutation_rate=0.1):
     for gait in offspring:
         for frame in gait:
@@ -172,17 +164,12 @@ def mutation(offspring, mutation_rate=0.1):
                     frame[idx] = round(random.uniform(-0.5, 0), 3)
     return offspring
 
-# -----------------------------
-# Create new population
-# -----------------------------
+
 def new_population(selected_parents, offspring, population):
     new_pop = [population[i] for i in selected_parents]
     new_pop.extend(offspring)
     return new_pop[:len(population)]
 
-# -----------------------------
-# Animation
-# -----------------------------
 def animate_gait(frames):
     fig = plt.figure(figsize=(8,8))
     ax = fig.add_subplot(111, projection='3d')
@@ -202,9 +189,7 @@ def animate_gait(frames):
     ani = FuncAnimation(fig, update, frames=len(frames), interval= 300)
     plt.show()
 
-# -----------------------------
-# Main GA Loop
-# -----------------------------
+
 def main():
     population_size = 10
     generations = 50

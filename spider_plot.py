@@ -101,7 +101,7 @@ def plot_spider_pose(ax, angles):
     ax.set_ylim([-4,4])
     ax.set_zlim([-2,2])
     ax.set_xlabel("X"); ax.set_ylabel("Y"); ax.set_zlabel("Z")
-    ax.view_init(0,90) #elev=30, azim=45
+    ax.view_init(elev=30, azim=45)
     ax.grid(True)
 
     # draw body
