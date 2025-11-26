@@ -75,8 +75,7 @@ Outputs:
 - WARNING: Our prediction are not exact!
  
 Your terminal should look something like this:
-
-`Generated sequence shape: (900, 24)
+```Generated sequence shape: (900, 24)
 Sequence-based 4-frame -> next-frame prediction:
 Sequence length: 900
 training_inputs.shape: (896, 96) (4 consecutive frames)
@@ -99,4 +98,4 @@ Target output is  [ 0.347 -0.553 -0.493  0.061 ... -0.045 ]
 Neural Network actual output is  [ -0.00708759 -1.02369094 -0.20418996 -0.00361378 ... -0.17759569 ]
 
 there is an error (not MSQE) of  [0.35408759  0.47069094 -0.28881004  0.06461378 ... 0.13259569]
-=================================================================`
+=================================================================```
