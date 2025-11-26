@@ -33,18 +33,18 @@ Outputs:
 - A display that shows a 3D animation of the spider frames.
 - A window that shows the plotted average fitness across all generations and frames AFTER you close the spider animation window.
 
-    > Your terminal should look something like this:
+Your terminal should look something like this:
 
-    > progress 1
-    > best [396.04999999999984]
-    > progress 2
-    > best [900.56]
-    > progress 3
-    > best [1013.7900000000001]
-    > ...
-    > progress 299 
-    > best [4305.9]
-    > Successfully wrote data to output_data.csv
+    progress 1
+    best [396.04999999999984]
+    progress 2
+    best [900.56]
+    progress 3
+    best [1013.7900000000001]
+    ...
+    progress 299 
+    best [4305.9]
+    successfully wrote data to output_data.csv
 
 -----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -77,28 +77,28 @@ Outputs:
  
 Your terminal should look something like this:
 
-> Generated sequence shape: (900, 24)
-> Sequence-based 4-frame -> next-frame prediction:
-> Sequence length: 900
-> training_inputs.shape: (896, 96) (4 consecutive frames)
-    > targets.shape: (896, 24) (next frame)
-    > training_inputs.shape: (896, 96) dtype: float64
-    > targets.shape: (896, 24) dtype: float64
-    > first sample shape: (96,)
+Generated sequence shape: (900, 24)
+Sequence-based 4-frame -> next-frame prediction:
+Sequence length: 900
+training_inputs.shape: (896, 96) (4 consecutive frames)
+    targets.shape: (896, 24) (next frame)
+    training_inputs.shape: (896, 96) dtype: float64
+    targets.shape: (896, 24) dtype: float64
+    first sample shape: (96,)
 
-> Epoch 1/100 - avg MSQE: 0.735545
-> Epoch 2/100 - avg MSQE: 0.735518
-> Epoch 3/100 - avg MSQE: 0.735490
-> ...
-> Epoch 100/100 - avg MSQE: 0.110448
+Epoch 1/100 - avg MSQE: 0.735545
+Epoch 2/100 - avg MSQE: 0.735518
+Epoch 3/100 - avg MSQE: 0.735490
+...
+Epoch 100/100 - avg MSQE: 0.110448
 
 
-> =============== Testing the Network Screen Output===============
-> Test input shape: (96,)
+=============== Testing the Network Screen Output===============
+Test input shape: (96,)
 
-> Target output is  [ 0.347 -0.553 -0.493  0.061 ... -0.045 ]
+Target output is  [ 0.347 -0.553 -0.493  0.061 ... -0.045 ]
 
->  Neural Network actual output is  [ -0.00708759 -1.02369094 -0.20418996 -0.00361378 ... -0.17759569 ]
+Neural Network actual output is  [ -0.00708759 -1.02369094 -0.20418996 -0.00361378 ... -0.17759569 ]
 
-> there is an error (not MSQE) of  [0.35408759  0.47069094 -0.28881004  0.06461378 ... 0.13259569]
-> =================================================================
+there is an error (not MSQE) of  [0.35408759  0.47069094 -0.28881004  0.06461378 ... 0.13259569]
+=================================================================
