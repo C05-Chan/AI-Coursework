@@ -40,13 +40,14 @@ def generate_frame():
 
 def fitness_function(reference, candidate, change):
     # ========================================================================================================== #
-    # Evaluates how close a proposed next frame (candidate) is to the last frame (reference) + a change (change) #
+    # Evaluates how close a proposed next frame (candidate) is to                                                #
+    #the last frame (reference) + a change (change) or short the target frame                                    #
     # Change makes sure to favor frames that are different from the last frame                                   #
     # ========================================================================================================== #
 
     fitness = 0
-    for i in range(len(reference)):
-        fitness += (abs(reference[i] - candidate[i] - change[i])*100)**2
+    for i in range(len(reference)): # iterates through all alleles
+        fitness += (abs(reference[i] - candidate[i] - change[i])*100)**2 # **2 to punish outliers harder. *100 is need to be sure that all values are more than 1 for **2
 
     return fitness
 
@@ -57,7 +58,7 @@ def roulette_selection(ranked_population):
     # While a higher fitness equals to a higher chance to be selected, the process is still random, as all individuals have a chance. #
     # =============================================================================================================================== #
     # We have to use 1 / (1 + i[0]) ** 2 to assign the chance,
-    # as a value assigned by the fitness function is equal to a better fitness
+    # as a value assigned by the fitness functio is equal to a better fitness
     # but should reflect a higher chance
     # +1 so we don't divide by 0
     sum = 0
@@ -262,7 +263,7 @@ def main():
     #How fast should the Animation run for?
     speed = 200
     #How many frames should the Animation have?
-    amount_frames = 300
+    amount_frames = 50
 
 
     latest_frame = generate_frame()
