@@ -256,9 +256,9 @@ def main():
 
     #These two define how good the GA will be and how long it will take.
     #Generations defines how many iterations the GA is running through
-    generations = 300
+    generations = 250
     #Population_size
-    population_size = 300
+    population_size = 150
 
     #How fast should the Animation run for?
     speed = 200

@@ -1,0 +1,111 @@
+---- Overview of the Genetic Algorithm ----
+
+Starting this task, we saw two possible ways to approach the problem:
+1. Using a GA to find a whole animation of n frames
+2. Using a GA to find the next frame, n times
+
+We started with the first approach, but quickly ran into several problems:
+- How do you evaluate a whole animation?
+- We wanted a smooth animation without sudden jumps between frames.
+- Crossover becomes difficult because two animations will not be at similar positions at a random crossover point.
+
+We tested this approach, but even with a simple case (one angle per frame) the number of generations needed was extremely high, and we do not have the computing power for this. A 50-frame animation would need thousands of generations, taking days to compute, and doing this with all 24 angles per frame would be impossible.
+
+This made us to switch to the second approach. It is simpler, still a complete GA, and it produces the results needed for the NN in part two. We preferred the first approach for complexity, but the second one is the practical choice.
+
+---- Chromosome Mapping ----
+
+Each chromosome is a list of 24 genes (represents the angles). Each individual is one frame.
+- Each gene is an angle value in radians
+- This matches the approach we chose and keeps everything simple and functional.
+
+
+---- Goal of our Genetic Algorithm ----
+
+The GA tries to find an appropriate next frame in relation to:
+- The last frame
+- The general direction of motion (target frame)
+
+There is no single perfect “next frame”, only a range of acceptable values. The angle can go higher or lower as long as it stays close and is not identical to the previous frame. To stop the spider from trembling in place with small changes, we introduced a 'change' variable.
+
+This variable isn’t part of the GA population. Instead, it helps us find a new acceptable next frame, that the GA should converge to, thus defining a goal.
+
+Main goals:
+- Follow the target frame
+- Avoid outliers
+
+---- Change Variable ----
+
+The change variable dictates a target frame that is close, but not identical, to the previous frame.
+
+- Each angle gets a random small positive or negative value.
+- Updated only with a 10% chance, or when an angle goes out of its border.
+- When updated, the sign flips and the value becomes a new random number within a range.
+
+The sign flip is important because it prevents movement drifting endlessly in the same direction.
+
+---- Borders ----
+
+We enforce borders so:
+- Legs do not cross
+- Legs do not go into the body
+- All angles remain within realistic limits
+
+Borders are applied during generation and during change direction decisions.
+
+---- Initialisation ----
+
+We generate the whole initial population using random angles within the borders.
+
+This can create odd-looking starting frames, but this is acceptable because it increases variety, which helps with overall GA performance.
+
+---- Fitness Function ----
+
+The fitness function checks how close each angle is to its proposed target angle.
+
+- Big outliers are heavily punished by squaring the differences
+- Lower value = better fitness
+- We prefer all 24 angles to be “okay” rather than having a few perfect ones and a few terrible ones
+
+We could have designed a very complex fitness function, but for our simple goal this works well and handles both the target frame and outliers. Additionally, adding other complex checks like symmetry or stability check, but that would clash against our goals, using target frames. For example, our target frame may not be symmetrical, so if we are looking for a symmetrical spider that may contradict against our target frame.
+
+
+---- Selection Method ----
+
+We use roulette selection because it fits what we needed in our genetic algorithm:
+- It fits our fitness design — good individuals get a higher chance to be selected.
+- We want to avoid a situation where a very good individual isn’t picked (which can happen in tournament selection).
+- Roulette reduces this risk while keeping selection proportional to fitness meaning it punishes outliers heavily.
+
+
+---- Crossover ----
+
+We use single-point crossover to produce two children from two parents which fulfil our need to build next frame.
+- It is simple and fast
+- It guarantees that no good genes are lost
+- There is still a chance for a child to inherit the better angles of both parents
+
+---- Mutation ----
+
+Mutation loops through all alleles, and if one is selected, it is replaced by a new random value inside the borders.
+
+We chose replacement instead of small adjustments because:
+
+- It adds more variation
+- It keeps the population diverse
+- It avoids getting stuck in local patterns
+
+
+---- Animation ----
+
+At the end, the animation shows all the best frames produced by the GA. The smoother the animation looks, the better the GA performed.
+
+---- Graph ----
+
+The graph displays the average fitness improvement per generation.
+
+- X-axis: generation
+- Y-axis: average fitness (log scale)
+
+This visualises how the GA improves the frame quality over time.
+
