@@ -59,10 +59,10 @@ Python Libraries:
 To install required dependencies (if not done so already):
     Type `pip install numpy`.
 
-Once all that is done press "run" or if you are in a virtual environment type "python neural_network.py" OR "py neural_network.py" in the terminal.
+Once all that is done press "run" or if you are in a virtual environment type "python neural_networks.py" OR "py neural_networks.py" in the terminal.
 
 Inputs: 
-- You are required to have a 'test_data.csv' in the same folder as 'neural_network.py'!
+- You are required to have a 'test_data.csv' in the same folder as 'neural_networks.py'!
     - Currently there should be a 'test_data.csv' already provided for you in the zip. However, if you would like the data from the 'genetic_algorithm.py' you can rename the 'output_data.csv' to 'test_data.csv'.
 
 WARNING: the 'test_data.csv' must have more than 5 lines of example frames.
