@@ -1,9 +1,8 @@
 import random
-import math
 import csv
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from spider_plot import plot_spider_pose, forward_leg_kinematics2
+from spider_plot import plot_spider_pose
 
 best_fitness = []
 
@@ -209,6 +208,7 @@ def animate_frames(frames, speed = 200):
 
     def update(i):
         plot_spider_pose(ax, frames[i])
+        ax.set_title(f"Frame {i}")
         return []
 
     ani = FuncAnimation(fig, update, frames=len(frames), interval=speed)
@@ -234,14 +234,14 @@ def main(nn=False):
 
     #These two define how good the GA will be and how long it will take.
     #Generations defines how many iterations the GA is running through
-    generations = 300
+    generations = 500
     #Population_size
-    population_size = 1000
+    population_size = 100
 
     #How fast should the Animation run for?
     speed = 200
     #How many frames should the Animation have?
-    amount_frames = 25
+    amount_frames = 300
 
 
     latest_frame = generate_frame()
@@ -294,6 +294,5 @@ def main(nn=False):
     animate_frames(total_frames, speed)
 
     plot_graph(avg_fitness_frames)
-
 
 main()
