@@ -1,0 +1,97 @@
+How to run the genetic algorithms:
+
+Required Software:
+- Python
+
+Python Libraries:
+- Matplotlib
+- Numpy
+- Spider_plot (file within the zip folder)
+
+To install required dependencies:
+    Type `pip install matplotlib numpy`.
+
+PLEASE CHECK!
+- This line is at the top of the "genetic_algorithm" file: 
+    `from spider_plot import plot_spider_pose`.
+
+- "spider_plot.py" is in the same folder as your main script.
+
+Once all that is done press "run" or if you are in a virtual environment type "python genetic_algorithm.py" OR "py genetic_algorithm.py" in the terminal.
+
+Inputs: 
+- You should not be asked to put any inputs!
+
+Outputs:
+- Generate new spider leg frames.
+- Generate and saves all generated frames to a csv file called 'output_data.csv'.
+- A display that shows a 3D animation of the spider frames.
+- A window that shows the plotted average fitness across all generations and frames.
+
+    Your terminal should look something like this:
+
+    progress 1
+    best [396.04999999999984]
+    progress 2
+    best [900.56]
+    progress 3
+    best [1013.7900000000001]
+    ...
+    progress 300
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+How to run the neural networks:
+
+Required Software:
+- Python
+
+Python Libraries:
+- Numpy
+
+To install required dependencies (if not done so already):
+    Type `pip install numpy`.
+
+Once all that is done press "run" or if you are in a virtual environment type "python neural_network.py" OR "py neural_network.py" in the terminal.
+
+Inputs: 
+- You are required to have a 'test_data.csv' in the same folder as 'neural_network.py'!
+    - Currently there should be a 'test_data.csv' already provided for you in the zip. However, if you would like the data from the 'genetic_algorithm.py' you can rename the 'output_data.csv' to 'test_data.csv'.
+
+WARNING: the 'test_data.csv' must have more than 5 lines of example frames.
+
+
+Outputs:
+- The neural network learns to predict the 5th frame after given the last 4 frames.
+- It should output 24 numbers that are similar to the target frame.
+- The MSE should steadily decrease.
+- Error vector should be close to zero.
+- WARNING: Our prediction are not exact!
+ 
+ 
+ Your terminal should look something like this:
+
+    Generated sequence shape: (300, 24)
+    Sequence-based 4-frame -> next-frame prediction:
+    Sequence length: 300
+    training_inputs.shape: (296, 96) (4 consecutive frames)
+    targets.shape: (296, 24) (next frame)
+    training_inputs.shape: (296, 96) dtype: float64
+    targets.shape: (296, 24) dtype: float64
+    first sample shape: (96,)
+
+    Epoch 1/100 - avg MSQE: 0.680616
+    Epoch 2/100 - avg MSQE: 0.680609
+    Epoch 3/100 - avg MSQE: 0.680602
+    ...
+    Epoch 100/100 - avg MSQE: 0.678978
+
+
+    =============== Testing the Network Screen Output===============
+    Test input shape: (96,)
+
+    Target output is  [ -1.000e-03 -1.670e+00 -4.640e-01 ... 0.-4.970e-01 ]
+
+    Neural Network actual output is  [ -0.00103624 -0.00192044 -0.00130207 ... -0.0011679 ]
+
+    there is an error (not MSQE) of  [3.62369082e-05 -1.66807956e+00 -4.62697932e-01 ... -4.95832103e-01]
+    =================================================================

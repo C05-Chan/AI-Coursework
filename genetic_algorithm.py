@@ -1,9 +1,8 @@
 import random
-import math
 import csv
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from spider_plot import plot_spider_pose, forward_leg_kinematics2
+from spider_plot import plot_spider_pose
 
 best_fitness = []
 
@@ -46,9 +45,9 @@ def fitness_function(reference, candidate, change):
 
     fitness = 0
     for i in range(len(reference)):
-        fitness += (abs(reference[i] - candidate[i] - change[i]))
+        fitness += (abs(reference[i] - candidate[i] - change[i])*100)**2
 
-    return fitness**2
+    return fitness
 
 
 def roulette_selection(ranked_population):
@@ -59,14 +58,14 @@ def roulette_selection(ranked_population):
 
     sum = 0
     for i in ranked_population:
-        sum += 1 / (1 + i[0]) ** 4
+        sum += 1 / (1 + i[0]) ** 2
 
     roulette_wheel = []
     prev = 0
     for i in ranked_population:
-        value = 1 / (1 + (i[0]) ** 4)
-        roulette_wheel.append([prev + (value) / sum, i[1]])
-        prev += (value) / sum
+        value = 1 / (1 + (i[0]) ** 2)
+        roulette_wheel.append([prev + value / sum, i[1]])
+        prev += value / sum
 
     selected = []
     for _ in range(len(ranked_population)):
@@ -148,60 +147,60 @@ def change_vector(latest_frame, last_change):
 
         if random.random() > change_direction_prob and boundary_flat[b_index * 2] < latest_frame[i] < boundary_flat[b_index * 2 + 1]:
             change.append(last_change[i])
-            
+
         else:
             if last_change[i] > 0:
                 a = -1
             else:
                 a = 1
 
-            change.append(random.random() * change_scale * a)
+            change.append(round(random.random() * change_scale * a, 3))
 
     return change
 
 
-def geneticA(latest_frame, last_change, size=500, generations = 500):
+def geneticA(latest_frame, last_change, size, generations):
     # ================================================== #
     # This is the main function of the genetic Algorithm #
     # ================================================== #
     change = change_vector(latest_frame, last_change)
-
+    #This initializes the first generation
     population = []
     for _ in range(size):
         population.append(generate_frame())
 
-    avg_fitness_per_gen = []
+    avg_fitness_per_gen = [] # stores average fitness
 
+    #This starts the loop for the GA
     while generations > 1:
         generations -= 1
 
         rated_population = []
         total_fitness = 0
-        
+
         for frame in population:
-            fitness = fitness_function(latest_frame, frame, change)
-            rated_population.append([fitness, frame])
-            total_fitness += fitness
+            fitness = fitness_function(latest_frame, frame, change) # computes a fitness
+            rated_population.append([fitness, frame]) # assigns the fitness to the frame
+            total_fitness += fitness # for average fitness
+        avg_fitness_per_gen.append(total_fitness / len(population))  # stores average fitness
 
-        avg_fitness_per_gen.append(total_fitness/ len(population)) #stores average fitness for graph
-        
-        selected = roulette_selection(rated_population)
-        population = crossover(selected)
-        population = mutate(population)
+        selected = roulette_selection(rated_population) # selection
+        population = crossover(selected) # reproduction
+        population = mutate(population) # mutation
 
+    #This loop searches for the best frame
     best = [10000, []]
     for frame in population:
-        fitness_score = fitness_function(latest_frame, frame, change)
-        if best[0] > fitness_score:
-            best[0] = fitness_score
+        if best[0] > fitness_function(latest_frame, frame, change):
+            best[0] = fitness_function(latest_frame, frame, change)
             best[1] = frame
 
-    print("best", ["full", best[0]])
-    best_fitness.append(["full", best[0]])
-    
+    print("best", [best[0]])
+    best_fitness.append([best[0]])
     return best[1], change, avg_fitness_per_gen
 
-def animate_frames(frames):
+
+def animate_frames(frames, speed = 200):
     # ============================================================================== #
     # This is code to visualize the frames and has nothing to do with the actual GA. #
     # ============================================================================== #
@@ -210,62 +209,81 @@ def animate_frames(frames):
 
     def update(i):
         plot_spider_pose(ax, frames[i])
+        ax.set_title(f"Frame {i}")
         return []
 
-    ani = FuncAnimation(fig, update, frames=len(frames), interval=200)
+    ani = FuncAnimation(fig, update, frames=len(frames), interval=speed)
     plt.show()
 
 def plot_graph(avg_fitness_across_frames):
     # Plot average fitness progression across all frames (log scale)
     plt.figure(figsize=(10,5))
     plt.plot(avg_fitness_across_frames, label="Average Fitness Across All Frames")
-    plt.yscale("log")
+    #plt.yscale("log")
     plt.xlabel("Generation")
     plt.ylabel("Average Fitness (log scale)")
     plt.title("Average Fitness Progression Across All Generations & Frames")
     plt.legend()
     plt.show()
-    
+
 def main(nn=False):
+    # ============================================================================== #
+    # This is the main function
+    #
+    # In the following the parameters of the GA and the animation can be changed     #
+    # ============================================================================== #
+
+    #These two define how good the GA will be and how long it will take.
+    #Generations defines how many iterations the GA is running through
+    generations = 500
+    #Population_size
+    population_size = 100
+
+    #How fast should the Animation run for?
     speed = 200
-    amount_frames = 100
+    #How many frames should the Animation have?
+    amount_frames = 300
+
 
     latest_frame = generate_frame()
     total_frames = [latest_frame]
 
-    change = [random.choice([-0.1,0.1]) for _ in range(24)]
+    change = [random.choice([0.1,-0.1]) for _ in range(24)]
 
     all_avg_fitness_gen = []  # stores avg fitness per generation for each frame
 
     # Run GA for each frame
     while len(total_frames) < amount_frames:
         print("progress", len(total_frames))
-        new_frame, change, avg_fitness_per_gen = geneticA(latest_frame, change, 200, 200)
+        new_frame, change, avg_fitness_per_gen = geneticA(latest_frame, change, population_size, generations)
         total_frames.append(new_frame)
         latest_frame = new_frame
 
         all_avg_fitness_gen.append(avg_fitness_per_gen)
+    print("total", total_frames)
 
     num_gen = len(all_avg_fitness_gen[0])
     avg_fitness_frames = []
 
     for gen in range(num_gen):
-        generation_sum = 0  
-        
+        generation_sum = 0
+
         for frame_avg in all_avg_fitness_gen:
-            generation_sum += frame_avg[gen]  
-            
+            generation_sum += frame_avg[gen]
+
         generation_average = generation_sum / len(all_avg_fitness_gen)
-    
+
         avg_fitness_frames.append(generation_average)
 
-    # Save frames to CSV
     filename = 'output_data.csv'
+
     try:
         with open(filename, 'w', newline='') as csvfile:
             csv_writer = csv.writer(csvfile)
             csv_writer.writerows(total_frames)
+
         print(f"✅ Successfully wrote data to {filename}")
+
     except Exception as e:
         print(f"❌ An error occurred: {e}")
 
@@ -274,8 +292,8 @@ def main(nn=False):
     if nn:
         return total_frames
 
-    animate_frames(total_frames)
-    plot_graph(avg_fitness_frames)
+    animate_frames(total_frames, speed)
 
+    plot_graph(avg_fitness_frames)
 
 main()
