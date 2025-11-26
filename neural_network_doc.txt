@@ -45,7 +45,7 @@ So the 3-layer version worked best.
 
 -- Monitoring Progress --
 
-- We print the MSE per epoch to check whether training is improving or not, and whether hyperparameters need adjusting.
+- We print the MSE per epoch to check whether training is improving or not, and whether hyper-parameters need adjusting.
 
 ---- Results ----
 
