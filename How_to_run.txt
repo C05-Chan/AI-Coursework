@@ -70,28 +70,28 @@ Outputs:
  
  Your terminal should look something like this:
 
-    Generated sequence shape: (300, 24)
+    Generated sequence shape: (900, 24)
     Sequence-based 4-frame -> next-frame prediction:
-    Sequence length: 300
-    training_inputs.shape: (296, 96) (4 consecutive frames)
-    targets.shape: (296, 24) (next frame)
-    training_inputs.shape: (296, 96) dtype: float64
-    targets.shape: (296, 24) dtype: float64
+    Sequence length: 900
+    training_inputs.shape: (896, 96) (4 consecutive frames)
+    targets.shape: (896, 24) (next frame)
+    training_inputs.shape: (896, 96) dtype: float64
+    targets.shape: (896, 24) dtype: float64
     first sample shape: (96,)
 
-    Epoch 1/100 - avg MSQE: 0.680616
-    Epoch 2/100 - avg MSQE: 0.680609
-    Epoch 3/100 - avg MSQE: 0.680602
+    Epoch 1/100 - avg MSQE: 0.735545
+    Epoch 2/100 - avg MSQE: 0.735518
+    Epoch 3/100 - avg MSQE: 0.735490
     ...
-    Epoch 100/100 - avg MSQE: 0.678978
+    Epoch 100/100 - avg MSQE: 0.110448
 
 
     =============== Testing the Network Screen Output===============
     Test input shape: (96,)
 
-    Target output is  [ -1.000e-03 -1.670e+00 -4.640e-01 ... 0.-4.970e-01 ]
+    Target output is  [ 0.347 -0.553 -0.493  0.061 ... -0.045 ]
 
-    Neural Network actual output is  [ -0.00103624 -0.00192044 -0.00130207 ... -0.0011679 ]
+    Neural Network actual output is  [ -0.00708759 -1.02369094 -0.20418996 -0.00361378 ... -0.17759569 ]
 
-    there is an error (not MSQE) of  [3.62369082e-05 -1.66807956e+00 -4.62697932e-01 ... -4.95832103e-01]
+    there is an error (not MSQE) of  [0.35408759  0.47069094 -0.28881004  0.06461378 ... 0.13259569]
     =================================================================
