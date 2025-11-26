@@ -91,8 +91,7 @@ def crossover(selected):
 
         parent1 = selected[i]
 
-        if i + 1 < len(
-                selected):  # this is so that if the selected list in odd, the last parent would get paired with a random other parent.
+        if i + 1 < len(selected):  # this is so that if the selected list in odd, the last parent would get paired with a random other parent.
             parent2 = selected[i + 1]
         else:
             parent2 = random.choice(selected)
