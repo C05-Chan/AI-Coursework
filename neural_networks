@@ -5,7 +5,7 @@ import csv
 #because a lot of data will be needed, we will use a class approach.
 class Full_NN(object):
 #A Multi Layer Neural Network class. We use this as for the way we need to handle the variables is better suited.
-    def __init__(self, X=24, HL=[256,128,64,32], Y=24): #a constructor for some default values.
+    def __init__(self, X=96, HL=[128,64,32], Y=24): #a constructor for some default values.
         self.X=X    #inputs
         self.HL=HL  #hidden layers  
         self.Y=Y    #outputs
@@ -160,6 +160,8 @@ if __name__ == "__main__":
     test_target = targets[n]          # corresponding 24-element target
     NN_output = nn.FF(test_input)
 
+
+
 print("=============== Testing the Network Screen Output===============")
 print("Test input shape:", test_input.shape)
 print() 
@@ -167,3 +169,4 @@ print("Target output is ", test_target)
 print()
 print("Neural Network actual output is ", NN_output, "\nthere is an error (not MSQE) of ", test_target-NN_output)
 print("=================================================================")
+

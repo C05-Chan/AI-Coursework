@@ -1,3 +1,5 @@
+GITHUB LINK: https://github.com/C05-Chan/AI-Coursework.git
+
 How to run the genetic algorithms:
 
 Required Software:
@@ -21,12 +23,15 @@ Once all that is done press "run" or if you are in a virtual environment type "p
 
 Inputs: 
 - You should not be asked to put any inputs!
+- However, if you do want a better result on the GA , we do recommend changing the 'population' and the 'generations' to at least 300.
+    - To do this, go into 'genetic_algorithm.py' and find the function called "main()" (it should be near the bottom).
+    - There you should find "population = 150" and "generation = 250". These are the variables that needs to be changed for a better result.
 
 Outputs:
 - Generate new spider leg frames.
 - Generate and saves all generated frames to a csv file called 'output_data.csv'.
 - A display that shows a 3D animation of the spider frames.
-- A window that shows the plotted average fitness across all generations and frames.
+- A window that shows the plotted average fitness across all generations and frames AFTER you close the spider animation window.
 
     Your terminal should look something like this:
 
@@ -37,7 +42,10 @@ Outputs:
     progress 3
     best [1013.7900000000001]
     ...
-    progress 300
+    progress 299 
+    best [4305.9]
+    Successfully wrote data to output_data.csv
+
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 How to run the neural networks:
@@ -58,7 +66,6 @@ Inputs:
     - Currently there should be a 'test_data.csv' already provided for you in the zip. However, if you would like the data from the 'genetic_algorithm.py' you can rename the 'output_data.csv' to 'test_data.csv'.
 
 WARNING: the 'test_data.csv' must have more than 5 lines of example frames.
-
 
 Outputs:
 - The neural network learns to predict the 5th frame after given the last 4 frames.

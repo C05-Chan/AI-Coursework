@@ -1,0 +1,73 @@
+---- Overview of the Neural Network ----
+
+The goal of this neural network is to predict the next animation frame based on the previous 4 frames. The aim is to generate a full animation starting from one frame, similar to what the Genetic Algorithm (GA) would produce.
+
+- Input: a 96-value array (4 consecutive frames × 24 angles per frame)
+- Output: a 24-value array (the predicted next frame)
+
+---- Dataset Used----
+
+The dataset comes from a run of the GA, where the animation was extended to produce enough data for training.
+
+- Data was loaded using Python’s csv module.
+- For training, every set of 4 frames becomes an input and the 5th frame becomes the target output
+
+This structure lets the network learn how the motion changes from one frame to the next. However, this would lead some issues with the dataset, such as:
+    - Where it combines several separate 300-frame gaits.
+    - At the transition points between gaits, it would produce bad training examples that the network cannot learn from.
+    - The GA includes randomness in its mutation step, which creates unpredictable changes between frames. This randomness makes the network’s job harder and increases error.
+
+---- Network Structure ----
+
+We used a feed-forward neural network, because it is simple, effective, and works well for frame-to-frame prediction.
+
+The final model uses 3 hidden layers: [128, 64, 32]
+- These are powers of 2, chosen for efficiency.
+- We tested larger models, but they did affect negatively:
+    - Performed worse
+    - Took much longer to train
+
+So the 3-layer version worked best.
+
+---- Activation Function ----
+
+- We used Leaky ReLU over Standard ReLU cas it is better at dealing with negative inputs and outputs, which is important because angles can be negative.
+
+- We used Kaiming initialisation for assigning the parameters some values to start it from a dead zone so the values aren’t too small or too large.
+
+---- Training Details ----
+
+- We tested several learning rates with different layer structures, and learning rate 0.015 produced the best results.
+
+- Mean Squared Error (MSE) Loss function because it is simple and works well, especially because large errors that are further away get punished more.
+
+- Stochastic Gradient Descent (SGD) training method was used because it produces good results and worked well with this network and is versatile for this kind of task as long as we have the layers right.
+
+-- Monitoring Progress --
+
+- We print the MSE per epoch to check whether training is improving or not, and whether hyperparameters need adjusting.
+
+---- Results ----
+
+-- Positives --
+The NN always outputs valid angles.
+When plotted, the angles:
+    - Do not cross legs
+    - Stay within the expected limits
+    - Match the overall motion style of the GA outputs
+
+This means the network successfully learns the basic movement pattern.
+
+ -- Negatives --
+Error values are still quite high, especially for the J2-related angles.
+Likely reasons:
+    - Built-in randomness in the GA makes frame-to-frame changes unpredictable
+    - The dataset may not be large enough
+    - Transition frames between separate gait sequences give bad examples
+
+---- Possible Improvements ----
+
+- Remove or avoid the transition sections between different gait sequences.
+- Generate a larger dataset with smoother transitions.
+- Reduce randomness in the GA, or separate predictable segments for training.
+- Potentially try a different model type that handles sequences better (e.g., LSTM), although this may not be necessary if the dataset randomness is fixed.
