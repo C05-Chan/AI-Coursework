@@ -74,7 +74,6 @@ Outputs:
 - Error vector should be close to zero.
 - WARNING: Our prediction are not exact!
  
- 
 Your terminal should look something like this:
 
 Generated sequence shape: (900, 24)
@@ -92,8 +91,7 @@ Epoch 3/100 - avg MSQE: 0.735490
 ...
 Epoch 100/100 - avg MSQE: 0.110448
 
-
-=============== Testing the Network Screen Output===============
+**=============== Testing the Network Screen Output===============
 Test input shape: (96,)
 
 Target output is  [ 0.347 -0.553 -0.493  0.061 ... -0.045 ]
@@ -101,4 +99,4 @@ Target output is  [ 0.347 -0.553 -0.493  0.061 ... -0.045 ]
 Neural Network actual output is  [ -0.00708759 -1.02369094 -0.20418996 -0.00361378 ... -0.17759569 ]
 
 there is an error (not MSQE) of  [0.35408759  0.47069094 -0.28881004  0.06461378 ... 0.13259569]
-=================================================================
+=================================================================**
